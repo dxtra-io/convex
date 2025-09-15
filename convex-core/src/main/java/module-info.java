@@ -18,6 +18,7 @@ module convex.core {
 	exports convex.core.lang;
 	exports convex.etch;
 	exports convex.dlfs;
+	exports convex.postgres;
 
 	requires transitive org.antlr.antlr4.runtime;
 	requires org.apache.commons.text;
@@ -25,4 +26,7 @@ module convex.core {
 	requires transitive org.bouncycastle.provider;
 	requires org.bouncycastle.util;
 	requires org.slf4j;
+	requires java.sql;
+	requires com.zaxxer.hikari;
+	requires org.postgresql.jdbc;
 }

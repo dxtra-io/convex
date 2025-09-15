@@ -64,13 +64,20 @@ public class Stores {
 	}
 
 	/**
-	 * Sets the global store for this JVM. Global store is the store used for 
+	 * Sets the global store for this JVM. Global store is the store used for
 	 * any new thread.
-	 * 
+	 *
 	 * @param store Store instance to use as global store
 	 */
-	public static void setGlobalStore(EtchStore store) {
-		if (store==null) throw new IllegalArgumentException("Cannot set global store to null)");
+	public static void setGlobalStore(AStore store) {
+		if (store==null) throw new IllegalArgumentException("Cannot set global store to null");
 		globalStore=store;
+	}
+
+	/**
+	 * Compatibility method for EtchStore
+	 */
+	public static void setGlobalStore(EtchStore store) {
+		setGlobalStore((AStore) store);
 	}
 }
