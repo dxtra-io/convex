@@ -1,17 +1,10 @@
 package convex.core.store;
 
-import java.io.IOException;
-
-import convex.etch.EtchStore;
-
 public class Stores {
 
-	// Default store
-	private static AStore defaultStore=null;
-	
 	// Configured global store
 	private static AStore globalStore=null;
-	
+
 	// Thread local current store, in case servers want different stores
 	private static final ThreadLocal<AStore> currentStore = new ThreadLocal<>() {
 		@Override
@@ -19,11 +12,11 @@ public class Stores {
 			return getGlobalStore();
 		}
 	};
-	
+
 	/**
 	 * Gets the current (thread-local) Store instance. This is initialised to be the
 	 * global store, but can be changed with Stores.setCurrent(...)
-	 * 
+	 *
 	 * @return Store for the current thread
 	 */
 	public static AStore current() {
@@ -32,33 +25,22 @@ public class Stores {
 
 	/**
 	 * Sets the current thread-local store for this thread
-	 * 
+	 *
 	 * @param store Any AStore instance
 	 */
 	public static void setCurrent(AStore store) {
 		currentStore.set(store);
 	}
-	
-	private synchronized static AStore getDefaultStore() {
-		if (defaultStore==null) {
-			try {
-				defaultStore=EtchStore.createTemp("convex-db");
-			} catch (IOException e) {
-				throw new Error(e);
-			};
-		}
-		return defaultStore;
-	}
 
 	/**
-	 * Gets the global store instance. If not previously set, a default temporary
-	 * store will be created and used as the global store.
-	 * 
+	 * Gets the global store instance. PostgreSQL store must be explicitly configured.
+	 *
 	 * @return Current global store
+	 * @throws IllegalStateException if no global store has been set
 	 */
 	public static AStore getGlobalStore() {
 		if (globalStore==null) {
-			globalStore=getDefaultStore();
+			throw new IllegalStateException("No global store configured. PostgreSQL store must be explicitly set via setGlobalStore().");
 		}
 		return globalStore;
 	}
@@ -72,12 +54,5 @@ public class Stores {
 	public static void setGlobalStore(AStore store) {
 		if (store==null) throw new IllegalArgumentException("Cannot set global store to null");
 		globalStore=store;
-	}
-
-	/**
-	 * Compatibility method for EtchStore
-	 */
-	public static void setGlobalStore(EtchStore store) {
-		setGlobalStore((AStore) store);
 	}
 }

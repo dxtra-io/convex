@@ -16,7 +16,7 @@ import convex.core.data.Keywords;
 import convex.core.store.AStore;
 import convex.core.util.FileUtils;
 import convex.core.util.Utils;
-import convex.etch.EtchStore;
+// EtchStore removed - PostgreSQL only
 
 /**
  * Static tools and utilities for Peer configuration
@@ -110,11 +110,8 @@ public class Config {
 			String fname=o.toString();
 			File f=FileUtils.getFile(fname);
 			if (f.exists()) {
-				try {
-					return (T) EtchStore.create(f);
-				} catch (IOException e) {
-					return null;
-				}
+				// EtchStore removed - PostgreSQL store must be explicitly configured
+				throw new UnsupportedOperationException("EtchStore no longer supported. Use PostgreSQL store configuration.");
 			}
 		}
 		
@@ -184,13 +181,8 @@ public class Config {
 		T store=checkStore(config);
 		if (store!=null) return store;
 		
-		try {
-			store=(T) EtchStore.createTemp("defaultPeerStore");
-		} catch (IOException e) {
-			throw new ConfigException("Unable to configure temporary store due to IO error",e);
-		}
-		config.put(Keywords.STORE, store);
-		return store;
+		// EtchStore removed - PostgreSQL store must be explicitly configured
+		throw new ConfigException("No store configured. PostgreSQL store must be explicitly set via STORE configuration.");
 	}
 	
 	/**

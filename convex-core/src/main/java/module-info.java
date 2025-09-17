@@ -16,7 +16,6 @@ module convex.core {
 	exports convex.core.lang.ops;
 	exports convex.core.data;
 	exports convex.core.lang;
-	exports convex.etch;
 	exports convex.dlfs;
 	exports convex.postgres;
 

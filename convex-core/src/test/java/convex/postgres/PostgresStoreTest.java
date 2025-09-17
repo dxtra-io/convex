@@ -23,7 +23,7 @@ import convex.core.data.Strings;
 import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
 import convex.core.store.Stores;
-import convex.etch.EtchStore;
+// EtchStore removed - PostgreSQL only
 
 /**
  * Comprehensive tests for PostgresStore using TestContainers
@@ -315,5 +315,125 @@ public class PostgresStoreTest {
 
         Ref<convex.core.data.AString> ref2 = store.storeTopRef(Ref.get(cell), Ref.PERSISTED, null);
         assertTrue(ref2.getStatus() >= Ref.PERSISTED);
+    }
+
+    @Test
+    void testStoreTopRef() throws IOException {
+        // Test equivalent to EtchStoreTest.testStoreTopRef
+        AVector<CVMLong> testVector = Vectors.of(CVMLong.create(0), CVMLong.create(66758585));
+        Ref<AVector<CVMLong>> originalRef = testVector.getRef();
+        Hash hash = testVector.getHash();
+
+        // Store the top ref
+        Ref<AVector<CVMLong>> storedRef = store.storeTopRef(originalRef, Ref.STORED, null);
+        assertEquals(hash, storedRef.getHash());
+
+        // Verify it can be retrieved
+        Ref<AVector<CVMLong>> retrievedRef = store.readStoreRef(hash);
+        assertNotNull(retrievedRef);
+        assertEquals(testVector, retrievedRef.getValue());
+    }
+
+    @Test
+    void testPersistInternal() throws IOException {
+        // Test internal persistence mechanisms
+        AVector<convex.core.data.AString> testData = Vectors.of(
+            Strings.create("test1"),
+            Strings.create("test2"),
+            Strings.create("test3")
+        );
+
+        Ref<AVector<convex.core.data.AString>> ref = testData.getRef();
+
+        // Test persistence at different levels
+        ref.persist();
+        assertTrue(ref.getStatus() >= Ref.PERSISTED);
+
+        // Verify all child refs are also persisted
+        for (int i = 0; i < testData.size(); i++) {
+            Ref<convex.core.data.AString> childRef = testData.get(i).getRef();
+            assertTrue(childRef.getStatus() >= Ref.PERSISTED);
+        }
+    }
+
+    @Test
+    void testPersistedStatus() throws IOException {
+        // Test persistence status tracking
+        convex.core.data.AString testCell = Strings.create("persistence test");
+        Ref<convex.core.data.AString> ref = testCell.getRef();
+
+        // Initially not persisted
+        assertTrue(ref.getStatus() < Ref.PERSISTED);
+
+        // After persistence
+        ref.persist();
+        assertTrue(ref.getStatus() >= Ref.PERSISTED);
+
+        // Verify status is maintained after retrieval
+        Hash hash = testCell.getHash();
+        Ref<convex.core.data.AString> retrievedRef = store.refForHash(hash);
+        assertNotNull(retrievedRef);
+        assertTrue(retrievedRef.getStatus() >= Ref.PERSISTED);
+    }
+
+    @Test
+    void testStoreReopen() throws IOException, SQLException {
+        // Test store reopening functionality
+        String testData = "reopen test data";
+        convex.core.data.AString cell = Strings.create(testData);
+        Hash hash = cell.getHash();
+
+        // Store data in current store
+        cell.getRef().persist();
+
+        // Close current store
+        store.close();
+
+        // Create new store instance with same connection
+        String jdbcUrl = postgres.getJdbcUrl();
+        String username = postgres.getUsername();
+        String password = postgres.getPassword();
+
+        PostgresStore newStore = new PostgresStore(jdbcUrl, username, password);
+
+        // Verify data is still accessible
+        Ref<convex.core.data.AString> retrievedRef = newStore.refForHash(hash);
+        assertNotNull(retrievedRef);
+        assertEquals(testData, retrievedRef.getValue().toString());
+
+        newStore.close();
+    }
+
+    @Test
+    void testBeliefAnnounce() throws IOException {
+        // Test belief announcement functionality equivalent to EtchStoreTest.testBeliefAnnounce
+        AStore oldStore = Stores.current();
+        try {
+            Stores.setCurrent(store);
+
+            // Create test data similar to the Etch test
+            convex.core.data.AString data1 = Strings.create("belief test 1");
+            convex.core.data.AString data2 = Strings.create("belief test 2");
+            AVector<convex.core.data.AString> testVector = Vectors.of(data1, data2);
+
+            Ref<AVector<convex.core.data.AString>> vectorRef = testVector.getRef();
+            Hash vectorHash = vectorRef.getHash();
+
+            // Initially should not be in store
+            assertEquals(Ref.UNKNOWN, vectorRef.getStatus());
+            assertNull(store.refForHash(vectorHash));
+
+            // Announce the data (similar to belief announcement)
+            vectorRef.persist();
+
+            // Verify it's now in the store
+            assertTrue(vectorRef.getStatus() >= Ref.PERSISTED);
+            Ref<AVector<convex.core.data.AString>> retrievedRef = store.refForHash(vectorHash);
+            assertNotNull(retrievedRef);
+            assertEquals(testVector, retrievedRef.getValue());
+
+        } finally {
+            Stores.setCurrent(oldStore);
+        }
     }
 }
