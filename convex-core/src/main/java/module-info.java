@@ -6,6 +6,7 @@ module convex.core {
 	exports convex.core.data.type;
 	exports convex.core.init;
 	exports convex.core.lang.exception;
+	exports convex.core.lang.impl;
 	exports convex.core.transactions;
 	exports convex.core.util;
 	exports convex.core.exceptions;
