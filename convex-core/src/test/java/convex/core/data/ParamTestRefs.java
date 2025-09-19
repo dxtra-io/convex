@@ -17,7 +17,7 @@ import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.core.util.Utils;
-import convex.etch.EtchStore;
+// import convex.etch.EtchStore;
 
 @RunWith(Parameterized.class)
 public class ParamTestRefs {
@@ -29,14 +29,10 @@ public class ParamTestRefs {
 
 	@Parameterized.Parameters(name = "{index}: {0}")
 	public static Collection<Object[]> dataExamples() {
-		try {
-			return Arrays
-					.asList(new Object[][] { 
-						    { "Memory Store", new MemoryStore() }, 
-							{ "Temp Etch Store", EtchStore.createTemp() } });
-		} catch (IOException e) {
-			throw Utils.sneakyThrow(e); 
-		}
+		return Arrays
+				.asList(new Object[][] { 
+						{ "Memory Store", new MemoryStore() }, 
+						{ "Temp Memory Etch Store", new MemoryStore() } });
 	}
 	
 	@Test

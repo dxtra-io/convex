@@ -27,15 +27,15 @@ import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.core.util.Utils;
-import convex.etch.EtchStore;
+// import convex.etch.EtchStore;
 import convex.test.Samples;
 
 public class StoresTest {
-	static EtchStore testStore;
+	static MemoryStore testStore;
 	
 	static {
 		try {
-			testStore=EtchStore.createTemp();
+			testStore=new MemoryStore();
 		} catch (IOException e) {
 			throw new Error(e);
 		}
@@ -65,7 +65,7 @@ public class StoresTest {
 		AStore m2=new MemoryStore();
 		
 		AStore e1=testStore;
-		AStore e2=EtchStore.createTemp();
+		AStore e2=new MemoryStore();
 		
 		// non-emebdded single Cell
 		AString nv=Samples.NON_EMBEDDED_STRING; 

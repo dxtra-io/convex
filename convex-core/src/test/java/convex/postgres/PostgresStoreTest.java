@@ -23,6 +23,7 @@ import convex.core.data.Strings;
 import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
 import convex.core.store.Stores;
+import convex.core.store.MemoryStore;
 // EtchStore removed - PostgreSQL only
 
 /**
@@ -59,7 +60,7 @@ public class PostgresStoreTest {
         }
         // Reset global store to default to prevent test interference
         try {
-            Stores.setGlobalStore(EtchStore.createTemp("default"));
+            Stores.setGlobalStore(new MemoryStore());
         } catch (Exception e) {
             // Ignore reset errors, other tests will create their own stores
         }

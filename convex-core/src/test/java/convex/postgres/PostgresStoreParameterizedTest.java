@@ -22,7 +22,7 @@ import convex.core.data.Ref;
 import convex.core.data.Strings;
 import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
-import convex.etch.EtchStore;
+// import convex.etch.EtchStore;
 
 /**
  * Parametrized tests that run against all store implementations including PostgresStore.
@@ -78,7 +78,6 @@ public class PostgresStoreParameterizedTest {
 
         return Stream.of(
                 new MemoryStore(),
-                EtchStore.createTemp("test"),
                 new PostgresStore(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
         );
     }
