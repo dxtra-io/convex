@@ -7,6 +7,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,16 +19,37 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import convex.core.Belief;
+import convex.core.Block;
+import convex.core.Order;
+import convex.core.crypto.AKeyPair;
+import convex.core.data.ACell;
+import convex.core.data.AMap;
 import convex.core.data.AVector;
+import convex.core.data.Blob;
+import convex.core.data.Blobs;
+import convex.core.data.Cells;
+import convex.core.data.Format;
 import convex.core.data.Hash;
+import convex.core.data.Keywords;
+import convex.core.data.Lists;
 import convex.core.data.Keyword;
 import convex.core.data.Maps;
 import convex.core.data.Ref;
+import convex.core.data.Refs;
 import convex.core.data.Strings;
 import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
+import convex.core.transactions.ATransaction;
+import convex.core.transactions.Invoke;
+import convex.core.transactions.Transfer;
+import convex.core.init.InitTest;
+import convex.core.lang.Symbols;
+import convex.core.store.AStore;
 import convex.core.store.Stores;
 import convex.core.store.MemoryStore;
+import convex.core.util.Utils;
+
 // EtchStore removed - PostgreSQL only
 
 /**
@@ -72,6 +98,9 @@ public class PostgresStoreTest {
 
             // Create schema
             stmt.execute("CREATE SCHEMA IF NOT EXISTS convex");
+
+            // stmt.execute("DROP TABLE IF EXISTS convex.cells");
+            // stmt.execute("DROP TABLE IF EXISTS convex.root");
 
             // Create cells table
             stmt.execute("""
@@ -187,27 +216,30 @@ public class PostgresStoreTest {
 
     @Test
     void testNoveltyHandler() throws IOException {
-        final boolean[] noveltyDetected = {false};
+		AStore oldStore = Stores.current();
+		ArrayList<Ref<ACell>> al = new ArrayList<>();
+		try {
+			Stores.setCurrent(store);
+			// create a random item that shouldn't already be in the store
+			AVector<Blob> data = Vectors.of(Blob.createRandom(new Random(), 100),Blob.createRandom(new Random(), 100));
 
-        String testData = "Novelty test";
-        store.storeTopRef(
-                Ref.get(Strings.create(testData)),
-                Ref.STORED,
-                ref -> noveltyDetected[0] = true
-        );
+			// handler that records added refs
+			Consumer<Ref<ACell>> handler = r -> al.add(r);
 
-        assertTrue(noveltyDetected[0], "Novelty handler should be called for new data");
+			Ref<AVector<Blob>> dataRef = data.getRef();
+			Hash dataHash = dataRef.getHash();
+			assertNull(store.refForHash(dataHash));
 
-        // Reset and store the same data again
-        noveltyDetected[0] = false;
-        store.storeTopRef(
-                Ref.get(Strings.create(testData)),
-                Ref.STORED,
-                ref -> noveltyDetected[0] = true
-        );
+			Cells.announce(data,handler);
+			int num=al.size(); // number of novel cells persisted
+			assertTrue(num>0); // got new novelty
+			assertEquals(data, al.get(num-1).getValue());
 
-        // Should not trigger novelty handler for existing data
-        assertFalse(noveltyDetected[0], "Novelty handler should not be called for existing data");
+			data.getRef().persist();
+			assertEquals(num, al.size()); // no new novelty transmitted
+		} finally {
+			Stores.setCurrent(oldStore);
+		}
     }
 
     @Test
@@ -250,7 +282,7 @@ public class PostgresStoreTest {
     @Test
     void testStoreIntegrationWithGlobalStore() throws IOException {
         // Set PostgresStore as global store
-        Stores.setGlobalStore(store);
+        Stores.setCurrent(store);
 
         assertEquals(store, Stores.current());
 
@@ -336,45 +368,38 @@ public class PostgresStoreTest {
     }
 
     @Test
-    void testPersistInternal() throws IOException {
-        // Test internal persistence mechanisms
-        AVector<convex.core.data.AString> testData = Vectors.of(
-            Strings.create("test1"),
-            Strings.create("test2"),
-            Strings.create("test3")
-        );
-
-        Ref<AVector<convex.core.data.AString>> ref = testData.getRef();
-
-        // Test persistence at different levels
-        ref.persist();
-        assertTrue(ref.getStatus() >= Ref.PERSISTED);
-
-        // Verify all child refs are also persisted
-        for (int i = 0; i < testData.size(); i++) {
-            Ref<convex.core.data.AString> childRef = testData.get(i).getRef();
-            assertTrue(childRef.getStatus() >= Ref.PERSISTED);
-        }
+    void testPersistInternal() {
+		// an example internal definition
+		ACell c=Keywords.ADDRESS;
+		
+		// Interning is idempotent
+		assertSame(c,Cells.intern(c));
     }
 
     @Test
     void testPersistedStatus() throws IOException {
         // Test persistence status tracking
-        convex.core.data.AString testCell = Strings.create("persistence test");
-        Ref<convex.core.data.AString> ref = testCell.getRef();
+        // generate Hash of unique secure random bytes to test - should not already be
+        // in store
+        Blob randomBlob = Blob.createRandom(new Random(), Format.MAX_EMBEDDED_LENGTH+1);
+        Hash hash = randomBlob.getHash();
+        assertNotEquals(hash, randomBlob);
 
-        // Initially not persisted
-        assertTrue(ref.getStatus() < Ref.PERSISTED);
+        Ref<Blob> initialRef = randomBlob.getRef();
+        assertEquals(Ref.UNKNOWN, initialRef.getStatus());
+        assertNull(Stores.current().refForHash(hash));
 
-        // After persistence
-        ref.persist();
-        assertTrue(ref.getStatus() >= Ref.PERSISTED);
+        // shallow persistence first
+        Ref<Blob> refShallow=initialRef.persistShallow();
+        assertEquals(Ref.STORED, refShallow.getStatus());
 
-        // Verify status is maintained after retrieval
-        Hash hash = testCell.getHash();
-        Ref<convex.core.data.AString> retrievedRef = store.refForHash(hash);
-        assertNotNull(retrievedRef);
-        assertTrue(retrievedRef.getStatus() >= Ref.PERSISTED);
+        Ref<Blob> ref = initialRef.persist();
+        assertEquals(Ref.PERSISTED, ref.getStatus());
+        assertTrue(ref.isPersisted());
+
+        Ref<Blob> newRef = Stores.current().refForHash(hash);
+        assertEquals(initialRef, newRef);
+        assertEquals(randomBlob, newRef.getValue());
     }
 
     @Test
@@ -382,11 +407,11 @@ public class PostgresStoreTest {
         // Test store reopening functionality
         String testData = "reopen test data";
         convex.core.data.AString cell = Strings.create(testData);
+
+        Ref<ACell> r=store.storeTopRef(cell.getRef(), Ref.STORED, null);
         Hash hash = cell.getHash();
 
-        // Store data in current store
-        cell.getRef().persist();
-
+    
         // Close current store
         store.close();
 
@@ -409,29 +434,76 @@ public class PostgresStoreTest {
     void testBeliefAnnounce() throws IOException {
         // Test belief announcement functionality equivalent to EtchStoreTest.testBeliefAnnounce
         AStore oldStore = Stores.current();
+        AtomicLong counter=new AtomicLong(0L);
+		AKeyPair kp=InitTest.HERO_KEYPAIR;
+
         try {
             Stores.setCurrent(store);
 
-            // Create test data similar to the Etch test
-            convex.core.data.AString data1 = Strings.create("belief test 1");
-            convex.core.data.AString data2 = Strings.create("belief test 2");
-            AVector<convex.core.data.AString> testVector = Vectors.of(data1, data2);
+			ATransaction t1=Invoke.create(InitTest.HERO,0, Lists.of(Symbols.PLUS, Symbols.STAR_BALANCE, 1000L));
+			ATransaction t2=Transfer.create(InitTest.HERO,1, InitTest.VILLAIN,1000000);
+			Block b=Block.of(Utils.getCurrentTimestamp(),kp.signData(t1),kp.signData(t2));
 
-            Ref<AVector<convex.core.data.AString>> vectorRef = testVector.getRef();
-            Hash vectorHash = vectorRef.getHash();
+			Order ord=Order.create().append(kp.signData(b));
 
-            // Initially should not be in store
-            assertEquals(Ref.UNKNOWN, vectorRef.getStatus());
-            assertNull(store.refForHash(vectorHash));
+			Belief belief=Belief.create(kp,ord);
 
-            // Announce the data (similar to belief announcement)
-            vectorRef.persist();
+			Ref<Belief> rb=belief.getRef();
+			Ref<ATransaction> rt=t1.getRef();
+			assertEquals(Ref.UNKNOWN,rb.getStatus());
+			assertEquals(Ref.UNKNOWN,rt.getStatus());
 
-            // Verify it's now in the store
-            assertTrue(vectorRef.getStatus() >= Ref.PERSISTED);
-            Ref<AVector<convex.core.data.AString>> retrievedRef = store.refForHash(vectorHash);
-            assertNotNull(retrievedRef);
-            assertEquals(testVector, retrievedRef.getValue());
+			assertEquals(3,Cells.refCount(t1));
+			assertEquals(0,Cells.refCount(t2));
+			assertEquals(14,Refs.totalRefCount(belief));
+
+
+			Consumer<Ref<ACell>> noveltyHandler=r-> {
+				counter.incrementAndGet();
+			};
+
+			// First try shallow persistence
+			counter.set(0L);
+			Ref<Belief> srb=rb.persistShallow(noveltyHandler);
+			assertEquals(Ref.STORED,srb.getStatus());
+			// One cell persisted, should only be novelty if embedded
+			assertEquals(belief.isEmbedded()?0L:1L,counter.get()); 
+
+			// assertEquals(srb,store.refForHash(rb.getHash()));
+			assertNull(store.refForHash(t1.getRef().getHash()));
+
+			// Persist belief
+			counter.set(0L);
+			Ref<Belief> prb=srb.persist(noveltyHandler);
+			assertEquals(4L,counter.get());
+
+			// Persist again. Should be no new novelty
+			counter.set(0L);
+			Ref<Belief> prb2=srb.persist(noveltyHandler);
+			assertEquals(prb2,prb);
+			assertEquals(0L,counter.get()); // Nothing new persisted
+
+			// Announce belief
+			counter.set(0L);
+			Ref<Belief> arb=Cells.announce(belief,noveltyHandler).getRef();
+			assertEquals(srb,arb);
+			assertEquals(4L,counter.get());
+
+			// Announce again. Should be no new novelty
+			counter.set(0L);
+			Ref<Belief> arb2=Cells.announce(belief,noveltyHandler).getRef();
+			assertEquals(srb,arb2);
+			assertEquals(0L,counter.get()); // Nothing new announced
+
+			// Check re-stored ref has correct status
+			counter.set(0L);
+			Ref<Belief> arb3=srb.persistShallow(noveltyHandler);
+			assertEquals(0L,counter.get()); // Nothing new persisted
+			assertTrue(Ref.STORED<=arb3.getStatus());
+
+			// Recover Belief from store. Should be top level stored
+			Belief recb=(Belief) store.refForHash(belief.getHash()).getValue();
+			assertEquals(belief,recb);
 
         } finally {
             Stores.setCurrent(oldStore);

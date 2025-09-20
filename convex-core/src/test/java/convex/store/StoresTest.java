@@ -34,11 +34,7 @@ public class StoresTest {
 	static MemoryStore testStore;
 	
 	static {
-		try {
-			testStore=new MemoryStore();
-		} catch (IOException e) {
-			throw new Error(e);
-		}
+		testStore=new MemoryStore();
 	}
 
 	@Test public void testInitState() throws InvalidDataException, IOException {

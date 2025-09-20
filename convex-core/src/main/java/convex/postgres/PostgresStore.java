@@ -20,9 +20,11 @@ import convex.core.data.ACell;
 import convex.core.data.Blob;
 import convex.core.data.Format;
 import convex.core.data.Hash;
+import convex.core.data.IRefFunction;
 import convex.core.data.Ref;
 import convex.core.exceptions.BadFormatException;
 import convex.core.store.ACachedStore;
+import convex.core.util.Utils;
 
 /**
  * PostgreSQL-based implementation of Convex storage using content-addressed storage.
@@ -171,6 +173,7 @@ public class PostgresStore extends ACachedStore {
             hash = ref.getHash();
             Ref<T> existing = refForHash(hash);
             if (existing != null && existing.getStatus() >= requiredStatus) {
+                log.debug("existing {}", hash);
                 return existing;
             }
         }
@@ -180,13 +183,32 @@ public class PostgresStore extends ACachedStore {
             if (topLevel || !embedded) {
                 refCache.putCell(ref);
             }
+            log.debug("add to cache ()", hash);
             return ref;
         }
 
-        // For embedded values, don't store unless top level
-        if (embedded && !topLevel) {
-            return ref.withMinimumStatus(requiredStatus);
-        }
+		// beyond STORED level, need to recursively persist child refs if they exist
+		if ((requiredStatus > Ref.STORED) && (cell.getRefCount() > 0)) {
+			// TODO: probably slow to rebuild these all the time!
+			IRefFunction func = r -> {
+                try {
+                    return storeRef((Ref<ACell>) r, requiredStatus, noveltyHandler, false);
+                } catch (IOException e) {
+                    // OK because overall function throws IOException
+                    throw Utils.sneakyThrow(e);
+                }
+            };
+
+			// need to do recursive persistence
+			// TODO: maybe switch to a stack? Mitigate risk of stack overflow?
+			ACell newObject = cell.updateRefs(func);
+
+			// perhaps need to update Ref
+			if (cell != newObject) {
+				ref = ref.withValue((T) newObject);
+				cell = newObject;
+			}
+		}
 
         // Store to PostgreSQL if not embedded or if top level
         if (topLevel || !embedded) {
@@ -199,13 +221,6 @@ public class PostgresStore extends ACachedStore {
 
                 // Store in PostgreSQL
                 storeCellToDatabase(fHash, encoding, requiredStatus);
-
-                // Call novelty handler if provided for new data
-                if (noveltyHandler != null) {
-                    noveltyHandler.accept((Ref<ACell>) ref);
-                }
-
-                log.trace("Stored cell with hash: {}", fHash.toHexString());
             }
 
             // Update ref status and cache
@@ -213,10 +228,23 @@ public class PostgresStore extends ACachedStore {
             if (!embedded) {
                 ref = ref.toSoft(this);
             }
-            refCache.putCell(ref);
             cell.attachRef(ref);
+            refCache.putCell(ref);
+            // Call novelty handler if provided for new data
+            if (noveltyHandler != null) {
+                if (!embedded) {
+                    noveltyHandler.accept((Ref<ACell>) ref);
+                }
+            }
+            log.trace("Stored cell with hash: {}", fHash.toHexString());
+        }
+        else {
+            // For embedded values, don't store unless top level
+            log.debug("not top level {}", ref.getHash());
+            return ref.withMinimumStatus(requiredStatus);
         }
 
+        cell.attachRef(ref);
         return ref;
     }
 
@@ -225,6 +253,7 @@ public class PostgresStore extends ACachedStore {
              PreparedStatement stmt = conn.prepareStatement(SELECT_CELL)) {
 
             stmt.setString(1, hash.toHexString());
+            log.debug("cellExistsInDatabase: {}", stmt.toString());
             ResultSet rs = stmt.executeQuery();
             return rs.next();
 
@@ -241,6 +270,7 @@ public class PostgresStore extends ACachedStore {
             stmt.setBytes(2, encoding.getBytes());
             stmt.setInt(3, status);
             stmt.setInt(4, encoding.size());
+            log.debug("storeCellToDatabase: {}", stmt.toString());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -267,6 +297,7 @@ public class PostgresStore extends ACachedStore {
             stmt.setString(1, hash.toHexString());
             ResultSet rs = stmt.executeQuery();
 
+            log.debug("refForHash: {}", stmt.toString());
             if (rs.next()) {
                 byte[] encoding = rs.getBytes("encoding");
                 Blob blob = Blob.wrap(encoding);
@@ -306,6 +337,7 @@ public class PostgresStore extends ACachedStore {
              PreparedStatement stmt = conn.prepareStatement(SET_ROOT_HASH)) {
 
             stmt.setString(1, newRootHash.toHexString());
+            log.debug("setRootData: {}", stmt.toString());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -317,6 +349,35 @@ public class PostgresStore extends ACachedStore {
 
         log.debug("Set new root hash: {}", newRootHash.toHexString());
         return ref;
+    }
+
+    public <T extends ACell> Ref<T> readStoreRef(Hash hash) throws IOException {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_CELL)) {
+
+            stmt.setString(1, hash.toHexString());
+            log.debug("readStoreRef: {} ", stmt.toString());
+            ResultSet rs = stmt.executeQuery();
+
+
+            if (rs.next()) {
+                byte[] encoding = rs.getBytes("encoding");
+                Blob blob = Blob.wrap(encoding);
+
+                ACell cell = decode(blob);
+                Ref<T> ref = (Ref<T>) Ref.get(cell);
+                ref = ref.withMinimumStatus(Ref.STORED);
+                ref = ref.toSoft(this);
+
+                refCache.putCell(ref);
+                return ref;
+            }
+
+        } catch (SQLException | BadFormatException e) {
+            throw new IOException("Failed to read store ref", e);
+        }
+
+        return null;
     }
 
     @Override
