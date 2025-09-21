@@ -86,7 +86,10 @@ public class PostgresStoreTest {
         }
         // Reset global store to default to prevent test interference
         try {
-            Stores.setGlobalStore(new MemoryStore());
+            MemoryStore memoryStore = new MemoryStore();
+            Stores.setGlobalStore(memoryStore);
+            Stores.setCurrent(memoryStore);
+
         } catch (Exception e) {
             // Ignore reset errors, other tests will create their own stores
         }

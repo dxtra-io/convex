@@ -111,9 +111,10 @@ public class MemoryStore extends AStore {
 			if (log.isTraceEnabled()) {
 				log.trace("Persisting ref 0x"+fHash.toHexString()+" of class "+Utils.getClassName(oTemp)+" with store "+this);
 			}
-			
+			Ref<T> existing = refForHash(hash);
+
 			hashRefs.put(fHash, (Ref<ACell>) ref);
-			if (noveltyHandler != null) noveltyHandler.accept((Ref<ACell>) ref);
+			if (noveltyHandler != null && existing == null) noveltyHandler.accept((Ref<ACell>) ref);
 		}
 		return ref.withMinimumStatus(requiredStatus);
 	}
