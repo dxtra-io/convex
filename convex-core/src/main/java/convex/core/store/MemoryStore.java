@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import convex.core.data.ACell;
 import convex.core.data.Blob;
 import convex.core.data.Hash;
+import convex.core.data.IRefFunction;
 import convex.core.data.Ref;
 import convex.core.exceptions.BadFormatException;
 import convex.core.util.Utils;
@@ -45,13 +46,13 @@ public class MemoryStore extends AStore {
 	}
 	
 	@Override
-	public <T extends ACell> Ref<T> storeRef(Ref<T> r2, int status, Consumer<Ref<ACell>> noveltyHandler) {
-		return persistRef(r2,noveltyHandler,status,false); 
+	public <T extends ACell> Ref<T> storeRef(Ref<T> r2, int status, Consumer<Ref<ACell>> noveltyHandler) throws IOException  {
+		return storeRef(r2, status, noveltyHandler, false); 
 	}
 
 	@Override
-	public <T extends ACell> Ref<T> storeTopRef(Ref<T> ref, int status,Consumer<Ref<ACell>> noveltyHandler) {
-		return persistRef(ref,noveltyHandler,status,true); 
+	public <T extends ACell> Ref<T> storeTopRef(Ref<T> ref, int status,Consumer<Ref<ACell>> noveltyHandler) throws IOException  {
+		return storeRef(ref,status, noveltyHandler, true); 
 	}
 	
 	@Override
@@ -76,7 +77,7 @@ public class MemoryStore extends AStore {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends ACell> Ref<T> persistRef(Ref<T> ref, Consumer<Ref<ACell>> noveltyHandler, int requiredStatus, boolean topLevel) {
+	public <T extends ACell> Ref<T> storeRef(Ref<T> ref, int requiredStatus, Consumer<Ref<ACell>> noveltyHandler, boolean topLevel) throws IOException {
 		// Convert to direct Ref. Don't want to store a soft ref!
 		ref = ref.toDirect();
 
@@ -96,16 +97,44 @@ public class MemoryStore extends AStore {
 				ref=existing;
 			}
 		}
-		
+		if (requiredStatus < Ref.STORED) {
+			return ref;
+		}		
+		// beyond STORED level, need to recursively persist child refs if they exist
+		if ((requiredStatus > Ref.STORED) && (cell.getRefCount() > 0)) {
+			// TODO: probably slow to rebuild these all the time!
+			IRefFunction func = r -> {
+				try {
+					return storeRef((Ref<ACell>) r, requiredStatus, noveltyHandler, false);
+				} catch (IOException e) {
+					// OK because overall function throws IOException
+					throw Utils.sneakyThrow(e);
+				}
+			};
+
+			// need to do recursive persistence
+			// TODO: maybe switch to a stack? Mitigate risk of stack overflow?
+			ACell newObject = cell.updateRefs(func);
+
+			// perhaps need to update Ref
+			if (cell != newObject) {
+				ref = ref.withValue((T) newObject);
+				cell = newObject;
+			}
+		}
+
+
+		/*
 		// need to do recursive persistence
 		cell  = cell.updateRefs(r -> {
-			return persistRef(r,noveltyHandler,requiredStatus,false);
+			return storeRef(r,noveltyHandler,requiredStatus,false);
 		});
 		
 		ref=ref.withValue((T)cell);
-		final ACell oTemp=cell;
 
-		if (topLevel||!embedded) {
+		*/
+		final ACell oTemp=cell;
+		if (topLevel || !embedded) {
 			// Persist at top level
 			final Hash fHash = (hash!=null)?hash:ref.getHash();
 			if (log.isTraceEnabled()) {
@@ -113,10 +142,21 @@ public class MemoryStore extends AStore {
 			}
 			Ref<T> existing = refForHash(hash);
 
+			ref = ref.withMinimumStatus(requiredStatus);
 			hashRefs.put(fHash, (Ref<ACell>) ref);
-			if (noveltyHandler != null && existing == null) noveltyHandler.accept((Ref<ACell>) ref);
+			cell.attachRef(ref);
+
+			// call novelty handler if newly persisted non-embedded
+			if (noveltyHandler != null && existing == null) {
+				if (!embedded)
+					noveltyHandler.accept((Ref<ACell>) ref);
+			}
 		}
-		return ref.withMinimumStatus(requiredStatus);
+		else {
+			ref = ref.withMinimumStatus(requiredStatus);
+		}
+		cell.attachRef(ref);
+		return ref;
 	}
 
 	@Override

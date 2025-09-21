@@ -119,8 +119,8 @@ public class PostgresStoreParameterizedTest {
     }
 
     // Temporarily disabled due to different initialization behaviors between store types
-    // @ParameterizedTest
-    // @MethodSource("storeProvider")
+    @ParameterizedTest
+    @MethodSource("storeProvider")
     void testRootDataOperations_DISABLED(AStore testStore) throws IOException {
         this.store = testStore;
 
@@ -209,7 +209,6 @@ public class PostgresStoreParameterizedTest {
 
         String testData = "Status test for " + store.getClass().getSimpleName();
         AString str = Strings.create(testData);
-
         // Test different status levels
         Ref<AString> storedRef = store.storeTopRef(Ref.get(str), Ref.STORED, null);
         assertTrue(storedRef.getStatus() >= Ref.STORED, "Should achieve STORED status");

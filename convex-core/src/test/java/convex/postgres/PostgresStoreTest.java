@@ -384,6 +384,8 @@ public class PostgresStoreTest {
         // Test persistence status tracking
         // generate Hash of unique secure random bytes to test - should not already be
         // in store
+        Stores.setCurrent(store);
+
         Blob randomBlob = Blob.createRandom(new Random(), Format.MAX_EMBEDDED_LENGTH+1);
         Hash hash = randomBlob.getHash();
         assertNotEquals(hash, randomBlob);
