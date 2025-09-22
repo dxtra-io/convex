@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import convex.core.Result;
@@ -17,6 +18,8 @@ import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
 import convex.core.exceptions.BadFormatException;
 import convex.core.lang.RT;
+import convex.core.store.AStore;
+import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.net.Connection;
 import convex.net.MemoryByteChannel;
@@ -26,6 +29,13 @@ import convex.net.MessageType;
 import convex.net.impl.HandlerException;
 
 public class MessageReceiverTest {
+
+	private static AStore store = new MemoryStore();
+
+	@BeforeAll
+	public static void init() {
+		Stores.setGlobalStore(store);
+	}
 
 	@Test
 	public void testSimpleMessages() throws IOException, BadFormatException, HandlerException {

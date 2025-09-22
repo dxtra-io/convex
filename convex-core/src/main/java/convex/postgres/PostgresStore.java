@@ -40,7 +40,7 @@ public class PostgresStore extends ACachedStore {
     private static final Logger log = LoggerFactory.getLogger(PostgresStore.class.getName());
 
     private final HikariDataSource dataSource;
-    private volatile Hash rootHash = Hash.NULL_HASH;
+    private volatile Hash rootHash = null;
 
     // SQL statements
     private static final String INSERT_CELL =
@@ -75,7 +75,7 @@ public class PostgresStore extends ACachedStore {
             initializeRootHash();
         } catch (IOException e) {
             log.warn("Failed to initialize root hash from database", e);
-            this.rootHash = Hash.NULL_HASH;
+            this.rootHash = null;
         }
 
         log.info("PostgresStore initialized with JDBC URL: {}",
@@ -136,10 +136,10 @@ public class PostgresStore extends ACachedStore {
                 if (hashStr != null && !hashStr.isEmpty()) {
                     this.rootHash = Hash.fromHex(hashStr);
                 } else {
-                    this.rootHash = Hash.NULL_HASH;
+                    this.rootHash = null;
                 }
             } else {
-                this.rootHash = Hash.NULL_HASH;
+                this.rootHash = null;
             }
 
         } catch (SQLException e) {

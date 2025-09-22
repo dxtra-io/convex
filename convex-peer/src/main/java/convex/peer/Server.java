@@ -212,6 +212,7 @@ public class Server implements Closeable {
 			ACell rk=RT.cvm(config.get(Keywords.ROOT_KEY));
 			if (rk==null) rk=keyPair.getAccountKey();
 
+			// if the roothash is null, then set it up before an establish peer
 			Peer peer = Peer.restorePeer(store, keyPair, rk);
 			if (peer != null) {
 				log.info("Restored Peer with root data hash: {}",store.getRootHash());

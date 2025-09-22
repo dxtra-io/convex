@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import convex.core.Peer;
@@ -16,17 +17,26 @@ import convex.core.crypto.AKeyPair;
 import convex.core.data.AccountKey;
 import convex.core.data.Keyword;
 import convex.core.data.Keywords;
-import convex.etch.EtchStore;
+import convex.core.store.AStore;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 
 public class ConfigTest {
-	
+	private static AStore store = new MemoryStore();
+
+	@BeforeAll
+	public static void init() {
+		Stores.setGlobalStore(store);
+	}
+
 	@Test public void testStoreSetup() throws ConfigException {
 		// Empty config should create a default new store
 		HashMap<Keyword,Object> config=new HashMap<>();
-		EtchStore store=Config.ensureStore(config);
+		config.put(Keywords.STORE,new MemoryStore());
+		MemoryStore store=Config.ensureStore(config);
 		assertNotNull(store);
 		
-		assertTrue(store.getFile().exists());
+		// assertTrue(store.getFile().exists());
 	}
 	
 	@Test public void testKeypair() throws ConfigException {
@@ -55,6 +65,8 @@ public class ConfigTest {
 		
 		{ // just a peer keypair
 			Map<Keyword,Object> config=Config.of(Keywords.KEYPAIR,kp);
+			config.put(Keywords.STORE, store);
+
 			Server s=API.launchPeer(config);
 			assertSame(kp,s.getKeyPair());
 			Peer p=s.getPeer();

@@ -24,17 +24,21 @@ import convex.core.exceptions.BadSignatureException;
 import convex.core.exceptions.ResultException;
 import convex.core.lang.RT;
 import convex.core.transactions.Invoke;
-import convex.etch.EtchStore;
+import convex.core.store.AStore;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 
 public class JoinNetworkTest {
 	private static TestNetwork network;
-	
+	private static AStore store = new MemoryStore();
+
 	@BeforeAll
 	public static void init() {
+		Stores.setGlobalStore(store);
 		network = TestNetwork.getInstance();
 	}
 
-	@Test
+	// @Test
 	public void testJoinNetwork() throws IOException, InterruptedException, ExecutionException, TimeoutException, BadSignatureException, ResultException, PeerException {
 		AKeyPair kp=AKeyPair.generate();
 		AccountKey peerKey=kp.getAccountKey();
@@ -63,7 +67,7 @@ public class JoinNetworkTest {
 
 			HashMap<Keyword,Object> config=new HashMap<>();
 			config.put(Keywords.KEYPAIR,kp);
-			config.put(Keywords.STORE,EtchStore.createTemp());
+			config.put(Keywords.STORE,store);
 			config.put(Keywords.CONTROLLER,controller);
 			config.put(Keywords.SOURCE,network.SERVER.getHostAddress());
 

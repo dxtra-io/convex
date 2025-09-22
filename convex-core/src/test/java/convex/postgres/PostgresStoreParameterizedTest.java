@@ -127,13 +127,8 @@ public class PostgresStoreParameterizedTest {
         // Test initial root hash (should be NULL_HASH for empty stores)
         // Different store implementations handle uninitialized state differently
         Hash initialRoot;
-        try {
-            initialRoot = store.getRootHash();
-        } catch (NullPointerException e) {
-            // MemoryStore throws NPE when rootData is null
-            initialRoot = Hash.NULL_HASH;
-        }
-        assertEquals(Hash.NULL_HASH, initialRoot, "Initial root should be NULL_HASH");
+        initialRoot = store.getRootHash();
+        assertEquals(null, initialRoot, "Initial root should be null");
 
         // Set root data
         String rootData = "Root data for " + store.getClass().getSimpleName();

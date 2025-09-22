@@ -161,7 +161,7 @@ public class MemoryStore extends AStore {
 
 	@Override
 	public Hash getRootHash() throws IOException {
-		return rootData.getHash();
+		return rootData == null ? null : rootData.getHash();
 	}
 	
 	@SuppressWarnings("unchecked")

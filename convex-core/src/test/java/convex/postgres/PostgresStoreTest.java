@@ -181,7 +181,7 @@ public class PostgresStoreTest {
     void testRootHashManagement() throws IOException {
         // Initially should be NULL hash
         Hash initialRoot = store.getRootHash();
-        assertEquals(Hash.NULL_HASH, initialRoot);
+        assertEquals(null, initialRoot);
 
         // Set some root data
         String rootData = "This is root data";

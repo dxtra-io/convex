@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.hc.client5.http.fluent.Content;
 import org.apache.hc.client5.http.fluent.Request;
@@ -15,7 +16,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import convex.core.crypto.AKeyPair;
+import convex.core.data.Keyword;
+import convex.core.data.Keywords;
 import convex.core.init.Init;
+import convex.core.store.AStore;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 import convex.java.JSON;
 import convex.peer.API;
 import convex.peer.ConfigException;
@@ -29,10 +35,19 @@ public class RESTAPITest {
 	static String HOST_PATH;
 	static String API_PATH;
 	static AKeyPair KP;
+	static AStore store = new MemoryStore();
 	
 	@BeforeAll
 	public static void init() throws InterruptedException, ConfigException, LaunchException {
-		Server s=API.launchPeer();
+		Stores.setGlobalStore(store);
+
+		HashMap<Keyword,Object> config=new HashMap<>();
+
+		KP=AKeyPair.generate();
+		config.put(Keywords.KEYPAIR, KP);
+		config.put(Keywords.STORE,store);
+
+		Server s=API.launchPeer(config);
 		RESTServer rs=RESTServer.create(s);
 		rs.start(0);
 		rs.close();

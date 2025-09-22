@@ -104,8 +104,11 @@ public class Config {
 	@SuppressWarnings("unchecked")
 	public static <T extends AStore> T checkStore(Map<Keyword, Object> config) {
 		Object o=config.get(Keywords.STORE);
-		if (o instanceof AStore) return (T)o;
+		return (T)o;
 		
+		/*
+		remove checks
+		if (o instanceof AStore) return (T)o;
 		if ((o instanceof String)||(o instanceof AString)) {
 			String fname=o.toString();
 			File f=FileUtils.getFile(fname);
@@ -114,8 +117,8 @@ public class Config {
 				throw new UnsupportedOperationException("EtchStore no longer supported. Use PostgreSQL store configuration.");
 			}
 		}
-		
 		return null;
+		*/
 	}
 	
 	/**

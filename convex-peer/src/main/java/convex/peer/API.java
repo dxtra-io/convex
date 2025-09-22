@@ -164,6 +164,10 @@ public class API {
 		// Automatically manage Peer connections
 		config.put(Keywords.AUTO_MANAGE, true);
 
+		if (Stores.getGlobalStore() != null) {
+			config.put(Keywords.STORE,Stores.getGlobalStore());
+		}
+
 		for (int i = 0; i < count; i++) {
 			AKeyPair keyPair = keyPairs.get(i);
 			config.put(Keywords.KEYPAIR, keyPair);

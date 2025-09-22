@@ -15,10 +15,11 @@ import convex.core.data.Keyword;
 import convex.core.data.Keywords;
 import convex.core.exceptions.BadSignatureException;
 import convex.core.util.Utils;
-import convex.etch.EtchStore;
+import convex.core.store.MemoryStore;
 import convex.peer.API;
 import convex.peer.PeerException;
 import convex.peer.Server;
+import convex.core.store.MemoryStore;
 
 public class JoinTestNetwork {
 	InetSocketAddress hostAddress=Utils.toInetSocketAddress("convex.world:18888");
@@ -32,7 +33,7 @@ public class JoinTestNetwork {
 
 		HashMap<Keyword,Object> config=new HashMap<>();
 		config.put(Keywords.KEYPAIR,kp);
-		config.put(Keywords.STORE,EtchStore.create(new File("temp-join-db.etch")));
+		config.put(Keywords.STORE,new MemoryStore());
 		config.put(Keywords.CONTROLLER,acct);
 		config.put(Keywords.SOURCE,"convex.world:18888");
 
