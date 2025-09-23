@@ -281,6 +281,9 @@ public class PostgresStore extends ACachedStore {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ACell> Ref<T> refForHash(Hash hash) {
+        // Handle null hash case
+        if (hash == null) return null;
+
         // Check cache first
         Ref<T> cached = (Ref<T>) refCache.getCell(hash);
         if (cached != null) return cached;

@@ -32,6 +32,8 @@ public final class RefCache {
 	 * @return Cached Ref, or null if not found
 	 */
 	public Ref<?> getCell(Hash hash) {
+		if (hash == null) return null; // Can't cache null hashes
+
 		int ix=calcIndex(hash);
 		Ref<?> ref=cache[ix];
 		if (ref==null) return null;
@@ -61,11 +63,19 @@ public final class RefCache {
 	 * @param ref Ref to store
 	 */
 	public void putCell(Ref<?> ref) {
-		int ix=calcIndex(ref.getHash());
+		Hash hash = ref.getHash();
+		if (hash == null) return; // Can't cache refs with null hashes
+
+		int ix=calcIndex(hash);
 		cache[ix]=ref;
 	}
 
 	private int calcIndex(Hash h) {
+		if (h == null) {
+			// Handle null hash gracefully - use index 0
+			// This can happen during store initialization when root hash is null
+			return 0;
+		}
 		int hash=(int)h.longValue();
 		int ix=Math.floorMod(hash, size);
 		return ix;
