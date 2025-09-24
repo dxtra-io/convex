@@ -77,6 +77,15 @@ public class PostgresStoreTest {
         String password = postgres.getPassword();
 
         store = new PostgresStore(jdbcUrl, username, password);
+
+        // Initialize global store to prevent IllegalStateException
+        try {
+            MemoryStore memoryStore = new MemoryStore();
+            Stores.setGlobalStore(memoryStore);
+            Stores.setCurrent(memoryStore);
+        } catch (Exception e) {
+            // If this fails, continue with test
+        }
     }
 
     @AfterEach
