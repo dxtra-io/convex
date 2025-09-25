@@ -604,4 +604,13 @@ public class PostgresStore extends ACachedStore {
                            dataSource.getHikariPoolMXBean().getIdleConnections(),
                            dataSource.getHikariPoolMXBean().getTotalConnections());
     }
+
+    /**
+     * Gets the underlying DataSource for transaction metadata operations
+     * This is required for the transaction prepare/submit workflow
+     * @return The HikariDataSource instance used by this store
+     */
+    public DataSource getDataSource() {
+        return dataSource;
+    }
 }
