@@ -241,7 +241,6 @@ public class PostgresStore extends ACachedStore {
 
             // Use atomic store operation with proper locking
             ref = storeRefAtomic(ref, fHash, cell, requiredStatus, noveltyHandler, embedded);
-
             log.trace("Stored cell with hash: {}", fHash.toHexString());
         }
         else {
@@ -298,7 +297,7 @@ public class PostgresStore extends ACachedStore {
                 }
 
                 // Call novelty handler if provided and cell was novel
-                if (noveltyHandler != null && wasNovel && !embedded) {
+                if (noveltyHandler != null && !embedded) {
                     noveltyHandler.accept((Ref<ACell>) ref);
                 }
 
@@ -393,19 +392,22 @@ public class PostgresStore extends ACachedStore {
     @SuppressWarnings("unchecked")
     public <T extends ACell> Ref<T> refForHash(Hash hash) {
         // Handle null hash case
-        if (hash == null) return null;
+        if (hash == null) {
+            return null;
+        }
 
         // Handle special cases
         if (hash.equals(Hash.NULL_HASH)) {
             return (Ref<T>) Ref.NULL_VALUE;
         }
-
         // Use read lock for consistent cache access
         storeLock.readLock().lock();
         try {
             // Check cache first
             Ref<T> cached = (Ref<T>) refCache.getCell(hash);
-            if (cached != null) return cached;
+            if (cached != null) {
+                return cached;
+            }
         } finally {
             storeLock.readLock().unlock();
         }
@@ -562,7 +564,6 @@ public class PostgresStore extends ACachedStore {
                 } finally {
                     storeLock.writeLock().unlock();
                 }
-
                 return ref;
             }
 
