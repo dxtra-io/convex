@@ -212,12 +212,14 @@ public class Server implements Closeable {
 			ACell rk=RT.cvm(config.get(Keywords.ROOT_KEY));
 			if (rk==null) rk=keyPair.getAccountKey();
 
+			log.debug("Restoring peer");
 			// if the roothash is null, then set it up before an establish peer
 			Peer peer = Peer.restorePeer(store, keyPair, rk);
 			if (peer != null) {
 				log.info("Restored Peer with root data hash: {}",store.getRootHash());
 				return peer;
 			}
+			log.debug("Peer not restored");
 		}
 		State genesisState = (State) config.get(Keywords.STATE);
 		if (genesisState!=null) {

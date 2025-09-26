@@ -55,7 +55,7 @@ public class PostgresStore extends ACachedStore {
     private static final String INSERT_CELL =
         "INSERT INTO convex.cells (hash, encoding, status, size) VALUES (?, ?, ?, ?) ON CONFLICT (hash) DO NOTHING";
     private static final String SELECT_CELL =
-        "SELECT encoding FROM convex.cells WHERE hash = ?";
+        "SELECT encoding, status FROM convex.cells WHERE hash = ?";
     private static final String SELECT_CELL_EXISTS =
         "SELECT 1 FROM convex.cells WHERE hash = ? LIMIT 1";
     private static final String UPSERT_CELL =
@@ -195,7 +195,6 @@ public class PostgresStore extends ACachedStore {
             try {
                 Ref<T> existing = refForHash(hash);
                 if (existing != null && existing.getStatus() >= requiredStatus) {
-                    log.debug("existing {}", hash);
                     return existing;
                 }
             } finally {
@@ -245,7 +244,6 @@ public class PostgresStore extends ACachedStore {
         }
         else {
             // For embedded values, don't store unless top level
-            log.debug("not top level {}", ref.getHash());
             return ref.withMinimumStatus(requiredStatus);
         }
 
@@ -435,11 +433,12 @@ public class PostgresStore extends ACachedStore {
                 if (rs.next()) {
                     byte[] encoding = rs.getBytes("encoding");
                     Blob blob = Blob.wrap(encoding);
+                    int status = rs.getInt("status");
 
                     // Decode the cell
                     ACell cell = decode(blob);
                     Ref<T> ref = (Ref<T>) Ref.get(cell);
-                    ref = ref.withMinimumStatus(Ref.STORED);
+                    ref = ref.withMinimumStatus(status);
                     ref = ref.toSoft(this);
 
                     // Cache for future access atomically
