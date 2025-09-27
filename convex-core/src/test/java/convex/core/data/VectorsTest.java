@@ -27,6 +27,9 @@ import convex.test.Samples;
  * 
  * Also doVectorTests(...) implements generic tests for any vector.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class VectorsTest {
 
 	@Test

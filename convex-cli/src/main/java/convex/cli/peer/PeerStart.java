@@ -15,7 +15,7 @@ import convex.core.data.AccountKey;
 import convex.core.data.Address;
 import convex.core.data.Keyword;
 import convex.core.data.Keywords;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import convex.peer.API;
 import convex.peer.ConfigException;
 import convex.peer.LaunchException;
@@ -80,7 +80,7 @@ public class PeerStart extends APeerCommand {
 	@Option(names = { "-a", "--address" }, description = "Account address to use for the peer controller.")
 	private String controllerAddress;
 	
-	private AKeyPair findPeerKey(EtchStore store) {
+	private AKeyPair findPeerKey(PostgresStore store) {
 		// First check user supplied peer key. If we have it, use it
 		AKeyPair kp=checkPeerKey();
 		if (kp!=null) return kp;
@@ -98,9 +98,9 @@ public class PeerStart extends APeerCommand {
 		try {
 			List<AccountKey> peerList=API.listPeers(store);
 			if (peerList.size()==0) {
-				throw new CLIError(ExitCodes.CONFIG,"No peers configured in Etch store "+store+". Consider using `convex peer create` or `convex peer genesis` first.");
+				throw new CLIError(ExitCodes.CONFIG,"No peers configured in PostgreSQL store. Consider using `convex peer genesis` first.");
 			} else if (peerList.size()>1) {
-				throw new CLIError(ExitCodes.CONFIG,"Multiple peers configured in Etch store "+store+". specify which one you want with --peer-key.");
+				throw new CLIError(ExitCodes.CONFIG,"Multiple peers configured in PostgreSQL store. Specify which one you want with --peer-key.");
 			}
 			AccountKey peerKey=peerList.get(0);
 			AKeyPair pkp=storeMixin.loadKeyFromStore(peerKey.toHexString(), peerKeyMixin.getKeyPassword());
@@ -115,11 +115,11 @@ public class PeerStart extends APeerCommand {
 	@Override
 	public void execute() throws InterruptedException {
 		storeMixin.ensureKeyStore();
-		try (EtchStore store = etchMixin.getEtchStore()) {
+		try (PostgresStore store = openStore(isReset)) {
 			
 			AKeyPair peerKey=findPeerKey(store);
 			if (peerKey==null) {
-				informWarning("No --peer-key specified or inferred from Etch Store "+store);
+				informWarning("No --peer-key specified or inferred from PostgreSQL store");
 				showUsage();
 				return;
 			}

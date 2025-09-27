@@ -20,12 +20,16 @@ import convex.core.data.Keyword;
 import convex.core.data.Keywords;
 import convex.core.init.Init;
 import convex.core.lang.Symbols;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 import convex.java.Convex;
 import convex.java.JSON;
 import convex.peer.API;
 import convex.peer.ConfigException;
 import convex.peer.LaunchException;
 import convex.peer.Server;
+import convex.postgres.PostgresStore;
+import convex.store.PostgresTestHelper;
 
 /**
  * Tests for remote binary client
@@ -40,9 +44,12 @@ public class RemoteBinaryClientTest {
 	
 	@BeforeAll
 	public static void init() throws InterruptedException, ConfigException, LaunchException {
+		PostgresStore store = PostgresTestHelper.ensureStore();
+		Stores.setCurrent(store);
 		HashMap<Keyword,Object> config=new HashMap<>();
 		config.put(Keywords.KEYPAIR, AKeyPair.generate());
 		config.put(Keyword.create("faucet"), true);
+		config.put(Keywords.STORE, store);
 		Server s=API.launchPeer(config);
 		RESTServer rs=RESTServer.create(s);
 		rs.start(0);
@@ -55,6 +62,7 @@ public class RemoteBinaryClientTest {
 	@AfterAll 
 	public static void cleanShutdown() {
 		server.close();
+		Stores.setGlobalStore(new MemoryStore());
 	}
 	
 	@Test 

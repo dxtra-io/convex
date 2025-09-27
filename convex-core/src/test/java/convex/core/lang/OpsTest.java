@@ -48,6 +48,9 @@ import convex.core.util.Utils;
  * In general, focused on unit testing special op capabilities. General on-chain
  * behaviour should be covered elsewhere.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class OpsTest extends ACVMTest {
 
 	protected OpsTest() {

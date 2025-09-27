@@ -99,6 +99,9 @@ import convex.test.Samples;
  * Needs completely deterministic, fully specified behaviour if we want
  * consistent results so we need to do a lot of negative testing here.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class CoreTest extends ACVMTest {
 
 

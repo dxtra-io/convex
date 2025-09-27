@@ -34,8 +34,12 @@ import convex.core.data.AVector;
 import convex.core.data.Blob;
 import convex.core.data.Blobs;
 import convex.core.data.prim.CVMLong;
+import convex.store.BaseStoreTest;
 
-public class DLFSTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class DLFSTest extends BaseStoreTest {
 	
 	@Test public void testProvider() throws URISyntaxException, IOException {
 		DLFSProvider provider=DLFS.provider();

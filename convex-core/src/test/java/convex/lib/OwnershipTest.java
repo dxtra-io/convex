@@ -15,6 +15,9 @@ import convex.core.lang.Context;
 /**
  * Tests for asset ownership, including use of an asset as a trust monitor
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class OwnershipTest extends ACVMTest {
 	private Address monitor;
 

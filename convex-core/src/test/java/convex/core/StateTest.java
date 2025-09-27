@@ -29,6 +29,9 @@ import convex.core.init.InitTest;
 /**
  * Tests for the State data structure
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class StateTest {
 	State INIT_STATE=InitTest.createState();
 

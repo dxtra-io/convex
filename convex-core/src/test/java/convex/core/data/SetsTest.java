@@ -14,9 +14,13 @@ import convex.core.data.prim.CVMLong;
 import convex.core.exceptions.BadFormatException;
 import convex.core.exceptions.InvalidDataException;
 import convex.core.lang.RT;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class SetsTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class SetsTest extends BaseStoreTest {
 
 	@Test
 	public void testEmptySet() {

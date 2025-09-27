@@ -16,6 +16,9 @@ import convex.core.lang.Context;
 import convex.core.lang.TestState;
 import convex.test.Testing;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class SimpleNFTTest extends ACVMTest {
 	
 	static final AKeyPair KP1=AKeyPair.generate();

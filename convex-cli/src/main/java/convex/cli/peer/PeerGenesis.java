@@ -11,7 +11,7 @@ import convex.core.data.AccountKey;
 import convex.core.data.Keyword;
 import convex.core.data.Keywords;
 import convex.core.init.Init;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import convex.peer.API;
 import convex.peer.PeerException;
 import convex.peer.Server;
@@ -56,8 +56,7 @@ public class PeerGenesis extends APeerCommand {
 			return;
 		}
 		
-		EtchStore etch=etchMixin.getEtchStore();
-		try {
+		try (PostgresStore store = openStore()) {
 
 			// Key for initial peer. Needed for genesis start
 			AKeyPair peerKey = checkPeerKey();
@@ -78,8 +77,6 @@ public class PeerGenesis extends APeerCommand {
 				}
 			}
 	
-			EtchStore store=getEtchStore();
-			
 			State genesisState=Init.createState(govKey,genesisKey.getAccountKey(),List.of(peerKey.getAccountKey()));
 			inform("Created genesis state with hash: "+genesisState.getHash());
 			
@@ -93,8 +90,6 @@ public class PeerGenesis extends APeerCommand {
 			informSuccess("Convex genesis succeeded!");
 		}  catch (PeerException e) {
 			throw new CLIError("Peer genesis failed: "+e.getMessage(),e);
-		} finally {
-			etch.close();
 		}
 	}
 }

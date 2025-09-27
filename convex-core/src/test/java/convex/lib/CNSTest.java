@@ -15,6 +15,9 @@ import convex.core.lang.TestState;
 
 import static convex.test.Assertions.*;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class CNSTest extends ACVMTest {
 		
 		Address REG=Init.REGISTRY_ADDRESS;

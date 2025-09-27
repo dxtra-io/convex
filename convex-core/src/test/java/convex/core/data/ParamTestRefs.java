@@ -17,7 +17,6 @@ import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.core.util.Utils;
-// import convex.etch.EtchStore;
 
 @RunWith(Parameterized.class)
 public class ParamTestRefs {

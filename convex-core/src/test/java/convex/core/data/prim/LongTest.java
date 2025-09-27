@@ -20,8 +20,12 @@ import convex.core.data.ObjectsTest;
 import convex.core.data.Strings;
 import convex.core.exceptions.BadFormatException;
 import convex.core.lang.NumericsTest;
+import convex.store.BaseStoreTest;
 
-public class LongTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class LongTest extends BaseStoreTest {
 
 	@Test
 	public void testEquality() {

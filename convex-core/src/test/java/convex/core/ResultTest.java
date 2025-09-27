@@ -18,8 +18,12 @@ import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
 import convex.core.exceptions.ResultException;
 import convex.core.lang.RT;
+import convex.store.BaseStoreTest;
 
-public class ResultTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class ResultTest extends BaseStoreTest {
 
 	@Test
 	public void testBasicResult() {

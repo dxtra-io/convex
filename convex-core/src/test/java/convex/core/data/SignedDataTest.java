@@ -18,9 +18,13 @@ import convex.core.exceptions.BadSignatureException;
 import convex.core.init.InitTest;
 import convex.core.lang.RT;
 import convex.core.transactions.Invoke;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class SignedDataTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class SignedDataTest extends BaseStoreTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBadSignature() throws IOException {

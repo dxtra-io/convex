@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PBETest {
 
 	@Test

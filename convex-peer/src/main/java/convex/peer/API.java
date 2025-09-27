@@ -206,7 +206,7 @@ public class API {
 	}
 
 	/**
-	 * Gets the list of peers registered in the given Etch Store
+	 * Gets the list of peers registered in the configured persistent store (PostgreSQL).
 	 * @param store Store from which to read peers
 	 * @return null if peer list not present
 	 * @throws IOException in case of IO error reading peers from store

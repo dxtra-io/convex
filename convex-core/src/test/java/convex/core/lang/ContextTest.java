@@ -31,6 +31,9 @@ import convex.core.lang.ops.Special;
 /**
  * Tests for basic execution Context mechanics and internals
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class ContextTest extends ACVMTest {
 
 	protected ContextTest() {

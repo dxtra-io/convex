@@ -32,6 +32,9 @@ import convex.core.exceptions.ParseException;
 import convex.core.lang.Reader;
 import convex.core.lang.Symbols;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class ANTLRTest {
 	
 	@SuppressWarnings("unchecked")

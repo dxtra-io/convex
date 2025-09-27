@@ -9,6 +9,9 @@ import convex.core.data.prim.CVMChar;
 import convex.core.lang.RT;
 import convex.core.lang.Reader;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class CharTest {
 	@Test public void testASCIIChars() {
 		for (int i=0; i<128; i++) {

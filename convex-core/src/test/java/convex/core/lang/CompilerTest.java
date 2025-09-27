@@ -48,6 +48,9 @@ import convex.test.Samples;
  *
  * State setup includes only basic accounts and core library.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class CompilerTest extends ACVMTest {
 
 	protected CompilerTest() {

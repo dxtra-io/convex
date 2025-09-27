@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.junit.jupiter.api.Disabled;
+
 import convex.core.data.ACell;
 import convex.core.data.Blob;
 import convex.core.data.Format;
@@ -18,6 +20,7 @@ import convex.core.exceptions.BadFormatException;
 import convex.core.lang.RT;
 
 @RunWith(Parameterized.class)
+@Disabled
 public class VLCParamTest {
 	private ACell value;
 

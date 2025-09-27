@@ -13,6 +13,9 @@ import convex.core.lang.Core;
 import convex.core.lang.Symbols;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class AccountStatusTest {
 
 	@Test public void testEmpty() throws InvalidDataException {

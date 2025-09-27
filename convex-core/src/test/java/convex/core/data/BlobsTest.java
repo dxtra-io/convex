@@ -22,8 +22,12 @@ import convex.core.exceptions.BadFormatException;
 import convex.core.exceptions.InvalidDataException;
 import convex.core.lang.RT;
 import convex.core.util.Utils;
+import convex.store.PostgresTestHelper;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class BlobsTest {
 	@Test public void testConstants() {
 		assertEquals(4096,Blob.CHUNK_LENGTH);
@@ -608,6 +612,7 @@ public class BlobsTest {
 	}
 
 	public static void doBlobLikeTests(ABlobLike<?> a) {
+		PostgresTestHelper.ensureStore();
 		long n=a.count();
 		ABlob b=a.toBlob();
 

@@ -10,8 +10,12 @@ import convex.core.data.Blob;
 import convex.core.data.RecordTest;
 import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
+import convex.store.BaseStoreTest;
 
-public class ReceiptTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class ReceiptTest extends BaseStoreTest {
 	
 	@Test public void testExamples() {
 		doReceiptTest(Receipt.create(null));

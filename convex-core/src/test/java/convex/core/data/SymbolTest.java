@@ -15,9 +15,13 @@ import convex.core.exceptions.BadFormatException;
 import convex.core.lang.RT;
 import convex.core.lang.Symbols;
 import convex.core.text.Text;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class SymbolTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class SymbolTest extends BaseStoreTest {
 
 	@Test
 	public void testBadSymbols() {

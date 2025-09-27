@@ -13,7 +13,8 @@ import convex.core.data.Hash;
 import convex.core.data.Ref;
 import convex.core.data.Vectors;
 import convex.core.data.prim.CVMLong;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresSchemaManager;
+import convex.postgres.PostgresStore;
 
 /**
  * Benchmarks from the Etch database
@@ -27,7 +28,7 @@ import convex.etch.EtchStore;
  */
 public class EtchBenchmark {
 	
-	static final EtchStore store;
+	static final PostgresStore store;
 	
 	static long nonce=0;
 	
@@ -40,7 +41,8 @@ public class EtchBenchmark {
 	
 	static {
 		try {
-			store =EtchStore.createTemp();
+			store = PostgresStore.fromEnvironment();
+			PostgresSchemaManager.ensureSchema(store, true);
 			for (int i=0; i<NUMVALS; i++) {
 				AVector<CVMLong> v=Vectors.of(0L,(long)i);
 				Ref<ACell> r=v.getRef();
@@ -48,7 +50,7 @@ public class EtchBenchmark {
 				r.getHash();
 				store.storeTopRef(r, Ref.STORED, null);
 			}	
-		} catch (IOException e) {
+		} catch (IOException | java.sql.SQLException e) {
 			throw new Error(e);
 		}
 

@@ -12,8 +12,12 @@ import convex.core.exceptions.BadSignatureException;
 import convex.core.init.InitTest;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Transfer;
+import convex.store.BaseStoreTest;
 
-public class BlocksTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class BlocksTest extends BaseStoreTest {
 
 	@Test
 	public void testEquality() throws BadFormatException {

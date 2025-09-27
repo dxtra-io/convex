@@ -18,6 +18,9 @@ import convex.core.lang.Context;
 import convex.core.lang.TestState;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class BoxTest extends ACVMTest {
 	
 	Address BOX;

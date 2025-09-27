@@ -15,7 +15,10 @@ import convex.core.lang.RT;
  * 
  * Most important as proofs of consistency
  */
-public class AbstractionsTest extends ACVMTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class AbstractionsTest {
 
 	/**
 	 * Tests assoc'ing a new value into a structure

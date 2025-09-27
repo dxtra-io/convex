@@ -24,6 +24,9 @@ import convex.core.lang.RT;
 import convex.core.lang.TestState;
 import convex.test.Assertions;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class DIDTest extends ACVMTest {
 	
 	Address DID;

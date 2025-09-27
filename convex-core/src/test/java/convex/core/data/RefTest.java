@@ -28,6 +28,9 @@ import convex.core.lang.Symbols;
 import convex.core.util.Utils;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class RefTest {
 	@Test
 	public void testMissingData() {

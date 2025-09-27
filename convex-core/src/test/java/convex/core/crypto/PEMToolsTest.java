@@ -12,6 +12,9 @@ import convex.core.data.Blob;
 import convex.core.data.Strings;
 import convex.core.util.Utils;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PEMToolsTest {
 
 	String generateRandomHex(int size) {

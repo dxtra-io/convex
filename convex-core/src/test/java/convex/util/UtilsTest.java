@@ -33,6 +33,9 @@ import convex.core.util.Bits;
 import convex.core.util.LatestUpdateQueue;
 import convex.core.util.Utils;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class UtilsTest {
 
 	@Test

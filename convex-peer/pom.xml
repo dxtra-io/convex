@@ -29,6 +29,13 @@
         	<scope>compile</scope>
 		</dependency>		
 		<dependency>
+			<groupId>world.convex</groupId>
+			<artifactId>convex-core</artifactId>
+			<version>${convex.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 		    <groupId>org.slf4j</groupId>
 		    <artifactId>slf4j-simple</artifactId>
 		    <version>${slf4j.version}</version>
@@ -50,6 +57,18 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>1.20.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>1.20.3</version>
 			<scope>test</scope>
 		</dependency>
 <!--	<dependency>

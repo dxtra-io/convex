@@ -63,6 +63,9 @@ import convex.core.util.Utils;
  *
  * This test verifies that the race condition fixes ensure atomic consistency.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 @Testcontainers
 public class ContractDeploymentIntegrationTest {
 

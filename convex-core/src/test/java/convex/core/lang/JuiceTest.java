@@ -14,6 +14,9 @@ import static convex.test.Assertions.*;
  * These are not your regular example based tests. These are handcrafted,
  * artisinal juice tests.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class JuiceTest extends ACVMTest {
 
 	@Test

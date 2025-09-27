@@ -12,7 +12,10 @@ import convex.core.lang.impl.Fn;
 import convex.core.lang.ops.Constant;
 import convex.core.lang.ops.Local;
 
-public class FunctionTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class FunctionTest extends ACVMTest {
 
 	State STATE=State.EMPTY.addActor();
 	

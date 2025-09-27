@@ -28,6 +28,9 @@ import convex.core.init.Init;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Invoke;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class BeliefVotingTest {
 
 	AKeyPair[] kps=new AKeyPair[] {

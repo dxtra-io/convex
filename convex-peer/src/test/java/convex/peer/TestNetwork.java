@@ -21,6 +21,7 @@ import convex.core.data.Address;
 import convex.core.exceptions.ResultException;
 import convex.core.init.Init;
 import convex.core.util.Utils;
+import convex.store.PostgresTestHelper;
 
 /**
  * Singleton server cluster instance
@@ -62,6 +63,7 @@ public class TestNetwork {
 	private static TestNetwork instance = null;
 
 	private TestNetwork() {
+		PostgresTestHelper.ensureStore();
 		// Use fresh State
 		GENESIS_STATE=Init.createState(PEER_KEYS);
 		HERO=Address.create(Init.GENESIS_ADDRESS);

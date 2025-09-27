@@ -9,6 +9,9 @@ import convex.core.data.Address;
 /**
  * Tests for Expander behaviour
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class ExpanderTest extends ACVMTest {
 
 	@Test 

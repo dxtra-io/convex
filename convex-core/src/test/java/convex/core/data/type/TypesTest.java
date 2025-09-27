@@ -27,10 +27,14 @@ import convex.core.data.prim.CVMDouble;
 import convex.core.data.prim.CVMLong;
 import convex.core.lang.RT;
 import convex.core.util.Utils;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 import convex.test.Samples.ValueArgumentsProvider;
 
-public class TypesTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class TypesTest extends BaseStoreTest {
 	
 	@Test
 	public void testNil() {

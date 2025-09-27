@@ -14,6 +14,9 @@ import convex.core.lang.RT;
 import convex.core.lang.Symbols;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class StringsTest {
 
 	

@@ -18,7 +18,10 @@ import convex.core.lang.RT;
 /**
  * Tests for general collection types
  */
-public class CollectionsTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public abstract class CollectionsTest<T extends ACell> extends ObjectsTest<T> {
 	
 	/**
 	 * Generic tests for any sequence

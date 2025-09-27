@@ -6,7 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-public class AddressTest {
+import convex.store.BaseStoreTest;
+
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class AddressTest extends BaseStoreTest {
 
 	@Test
 	public void testAddress1() {

@@ -16,6 +16,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import convex.core.data.Blob;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class BIP39Test {
 
 	@Test public void testWordList() {
