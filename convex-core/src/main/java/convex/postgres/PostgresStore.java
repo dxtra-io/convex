@@ -84,6 +84,12 @@ public class PostgresStore extends ACachedStore {
             throw new IllegalArgumentException("DataSource must be HikariDataSource");
         }
 
+        try {
+            PostgresSchemaManager.ensureSchema(this, false);
+        } catch (SQLException e) {
+            log.warn("Failed to ensure PostgreSQL schema prior to initialisation", e);
+        }
+
         // Initialize root hash from database
         try {
             initializeRootHash();
@@ -165,6 +171,15 @@ public class PostgresStore extends ACachedStore {
         }
     }
 
+    void reloadRootHash() {
+        try {
+            initializeRootHash();
+        } catch (IOException e) {
+            log.warn("Failed to reload root hash from database", e);
+            this.rootHash = null;
+        }
+    }
+
     @Override
     public <T extends ACell> Ref<T> storeRef(Ref<T> ref, int status, Consumer<Ref<ACell>> noveltyHandler) throws IOException {
         return storeRef(ref, status, noveltyHandler, false);
@@ -191,15 +206,10 @@ public class PostgresStore extends ACachedStore {
             hash = ref.getHash();
 
             // Use read lock for cache check to prevent interference with concurrent stores
-            storeLock.readLock().lock();
-            try {
-                Ref<T> existing = refForHash(hash);
-                if (existing != null && existing.getStatus() >= requiredStatus) {
-                    log.debug("existing {}", hash);
-                    return existing;
-                }
-            } finally {
-                storeLock.readLock().unlock();
+            Ref<T> existing = refForHash(hash);
+            if (existing != null && existing.getStatus() >= requiredStatus) {
+                log.debug("existing {}", hash);
+                return existing;
             }
         }
 
@@ -317,41 +327,33 @@ public class PostgresStore extends ACachedStore {
      */
     private boolean storeCellAtomically(Hash hash, ACell cell, int status) throws IOException {
         try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(true); // Autocommit for single statement
             try {
                 // Encode the cell for storage
                 Blob encoding = Format.encodedBlob(cell);
 
                 // Use INSERT with ON CONFLICT to detect if cell is novel
-                boolean wasNovel;
-                try (PreparedStatement stmt = conn.prepareStatement(INSERT_CELL)) {
+                try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO convex.cells (hash, encoding, status, size) VALUES (?, ?, ?, ?) " +
+                    "ON CONFLICT (hash) DO UPDATE SET status = GREATEST(convex.cells.status, EXCLUDED.status) " +
+                    "RETURNING (xmax = 0) AS was_inserted")) {
+                    
                     stmt.setString(1, hash.toHexString());
                     stmt.setBytes(2, encoding.getBytes());
                     stmt.setInt(3, status);
                     stmt.setInt(4, encoding.size());
+                    
                     log.debug("storeCellAtomically: {}", stmt.toString());
-                    int rowsAffected = stmt.executeUpdate();
-
-                    // If rowsAffected > 0, the cell was inserted (novel)
-                    // If rowsAffected = 0, the cell already existed (conflict, not novel)
-                    wasNovel = rowsAffected > 0;
-                }
-
-                // If not novel but status might need updating, use UPDATE
-                if (!wasNovel) {
-                    try (PreparedStatement stmt = conn.prepareStatement(
-                            "UPDATE convex.cells SET status = GREATEST(status, ?) WHERE hash = ?")) {
-                        stmt.setInt(1, status);
-                        stmt.setString(2, hash.toHexString());
-                        stmt.executeUpdate();
+                    
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        return rs.getBoolean("was_inserted");
+                    } else {
+                        // This should not happen with RETURNING clause
+                        return false;
                     }
                 }
-
-                conn.commit();
-                return wasNovel;
-
             } catch (SQLException e) {
-                conn.rollback();
                 throw new IOException("Atomic cell storage failed for hash: " + hash.toHexString(), e);
             }
         } catch (SQLException e) {

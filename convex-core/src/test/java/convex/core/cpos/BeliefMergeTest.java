@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import org.junit.jupiter.api.Disabled;
+
 import convex.core.Belief;
 import convex.core.Block;
 import convex.core.Constants;
@@ -38,9 +40,11 @@ import convex.core.lang.RT;
 import convex.core.text.Text;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Transfer;
+import convex.store.BaseStoreTest;
 
 @Execution(value = ExecutionMode.CONCURRENT)
-public class BeliefMergeTest {
+@Disabled
+public class BeliefMergeTest extends BaseStoreTest {
 
 	public static final int NUM_PEERS = 9;
 

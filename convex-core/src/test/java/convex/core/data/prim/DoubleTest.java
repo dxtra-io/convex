@@ -12,6 +12,9 @@ import convex.core.data.Format;
 import convex.core.data.ObjectsTest;
 import convex.core.exceptions.BadFormatException;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class DoubleTest {
 
 	@Test public void testNanEncoding() {

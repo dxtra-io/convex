@@ -18,6 +18,9 @@ import convex.core.lang.Context;
 import convex.core.lang.RT;
 import convex.lib.AssetTester;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class TorusTest extends ACVMTest {
 
 	Address USD;

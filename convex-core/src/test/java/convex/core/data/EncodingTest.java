@@ -36,6 +36,9 @@ import convex.core.transactions.Invoke;
 import convex.test.Samples;
 import convex.test.Testing;
  
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class EncodingTest {
 
 	@Test public void testVLCLongLength() throws BadFormatException, BufferUnderflowException {

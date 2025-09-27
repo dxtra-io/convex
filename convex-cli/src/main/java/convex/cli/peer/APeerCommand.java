@@ -2,19 +2,19 @@ package convex.cli.peer;
 
 import convex.cli.ACommand;
 import convex.cli.Main;
-import convex.cli.mixins.EtchMixin;
+import convex.cli.mixins.PostgresMixin;
 import convex.cli.mixins.KeyMixin;
 import convex.cli.mixins.PeerKeyMixin;
 import convex.cli.mixins.KeyStoreMixin;
 import convex.core.crypto.AKeyPair;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.ParentCommand;
 
 public abstract class APeerCommand extends ACommand {
 
 	@Mixin
-    protected EtchMixin etchMixin;
+    protected PostgresMixin postgresMixin;
 	
 	@Mixin
     protected KeyMixin keyMixin;
@@ -34,8 +34,12 @@ public abstract class APeerCommand extends ACommand {
 		return parent.cli();
 	}
 
-	public EtchStore getEtchStore() {
-		return etchMixin.getEtchStore();
+	public PostgresStore openStore() {
+		return postgresMixin.openStore();
+	}
+
+	public PostgresStore openStore(boolean reset) {
+		return postgresMixin.openStore(reset);
 	}
 	
 	/**

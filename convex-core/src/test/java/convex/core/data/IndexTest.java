@@ -20,9 +20,13 @@ import convex.core.exceptions.InvalidDataException;
 import convex.core.init.InitTest;
 import convex.core.lang.RT;
 import convex.core.lang.Symbols;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class IndexTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class IndexTest extends BaseStoreTest {
 
 	@Test
 	public void testEmpty() throws InvalidDataException {

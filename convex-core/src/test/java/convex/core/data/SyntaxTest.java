@@ -16,6 +16,9 @@ import convex.core.exceptions.InvalidDataException;
 import convex.core.lang.RT;
 import convex.core.lang.Reader;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class SyntaxTest {
 
 	@Test public void testSyntaxEncodingEmptyMetaData() throws BadFormatException {

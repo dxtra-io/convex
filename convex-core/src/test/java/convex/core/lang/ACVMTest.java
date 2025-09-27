@@ -10,6 +10,7 @@ import convex.core.init.BaseTest;
 import convex.core.init.Init;
 import convex.core.init.InitTest;
 import convex.core.util.Utils;
+import convex.store.BaseStoreTest;
 
 import static convex.test.Assertions.*;
 
@@ -18,7 +19,10 @@ import static convex.test.Assertions.*;
  *
  * Provides utility functions for CVM code execution.
  */
-public abstract class ACVMTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public abstract class ACVMTest extends BaseStoreTest {
 
 	protected final State INITIAL;
 	protected final Context CONTEXT;

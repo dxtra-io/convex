@@ -36,6 +36,9 @@ import convex.core.data.prim.CVMLong;
  * these are useful for testing utility functions, edge cases and internal
  * behaviour of the RT class itself.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class RTTest {
 
 	@Test

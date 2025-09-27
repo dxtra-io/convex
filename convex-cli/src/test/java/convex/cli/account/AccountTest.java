@@ -12,27 +12,35 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import convex.cli.CLTester;
 import convex.cli.ExitCodes;
+import convex.cli.PostgresTestHelper;
 import convex.core.crypto.AKeyPair;
 import convex.core.data.AccountStatus;
 import convex.core.data.Address;
 import convex.core.data.Keyword;
 import convex.core.data.Keywords;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 import convex.peer.API;
 import convex.peer.ConfigException;
 import convex.peer.LaunchException;
 import convex.peer.Server;
+import convex.postgres.PostgresStore;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class AccountTest {
 
 	static final AKeyPair kp=AKeyPair.createSeeded(345634);
 	protected static Server SERVER;
+	protected static PostgresStore STORE;
 	protected static String PORT;
 
 	@BeforeAll
 	public static void setupPeer() throws LaunchException, ConfigException, InterruptedException {
+		STORE = PostgresTestHelper.createStore(true);
 		HashMap<Keyword,Object> config=new HashMap<>();
 		config.put(Keywords.KEYPAIR, kp);
+		config.put(Keywords.STORE, STORE);
+		Stores.setGlobalStore(STORE);
 		SERVER=API.launchPeer(config);
 		PORT=Integer.toString(SERVER.getPort());
 
@@ -74,5 +82,9 @@ public class AccountTest {
 	@AfterAll
 	public static void closePeer() {
 		SERVER.shutdown();
+		Stores.setGlobalStore(new MemoryStore());
+		if (STORE != null) {
+			STORE.close();
+		}
 	}
 }

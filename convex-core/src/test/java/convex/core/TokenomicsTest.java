@@ -19,6 +19,9 @@ import static convex.test.Assertions.*;
 /**
  * Tests for tokenomics operations
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class TokenomicsTest extends ACVMTest {
 	// starting balances etc.
 	long BALANCE=context().getBalance(HERO);

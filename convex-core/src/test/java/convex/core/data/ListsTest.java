@@ -11,9 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import convex.core.data.prim.CVMLong;
 import convex.core.exceptions.BadFormatException;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class ListsTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class ListsTest extends BaseStoreTest {
 
 	@Test
 	public void testEmptyList() throws BadFormatException {

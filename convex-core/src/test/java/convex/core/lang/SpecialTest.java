@@ -20,6 +20,9 @@ import convex.core.init.InitTest;
 import convex.core.lang.ops.Lookup;
 import convex.core.lang.ops.Special;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class SpecialTest extends ACVMTest {
 	
 

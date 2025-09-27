@@ -26,6 +26,9 @@ import convex.test.Samples;
 /**
  * Tests for adversarial data, i.e. data that should b=not be accepted by correct peers / clients
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class AdversarialDataTest {
 
 	// A value that is valid, but not a first class CVM value

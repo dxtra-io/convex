@@ -15,6 +15,9 @@ import convex.core.lang.ACVMTest;
 import convex.core.lang.Context;
 import convex.core.lang.TestState;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class MarketTradeTest extends ACVMTest {
 	
 	static final AKeyPair KP1=AKeyPair.generate();

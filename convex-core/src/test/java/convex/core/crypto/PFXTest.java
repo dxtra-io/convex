@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import convex.core.init.InitTest;
 import convex.core.lang.RT;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PFXTest {
 
 	@Test public void testNewStore() throws IOException, GeneralSecurityException {

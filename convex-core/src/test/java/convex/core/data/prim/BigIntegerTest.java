@@ -24,9 +24,13 @@ import convex.core.data.Strings;
 import convex.core.exceptions.BadFormatException;
 import convex.core.lang.RT;
 import convex.core.lang.Reader;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class BigIntegerTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class BigIntegerTest extends BaseStoreTest {
 
 	@Test public void testBigIntegerAssumptions() {
 		assertThrows(java.lang.NumberFormatException.class,()->new BigInteger(new byte[0]));

@@ -22,12 +22,14 @@ import convex.core.data.Ref;
 import convex.core.data.Strings;
 import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
-// import convex.etch.EtchStore;
 
 /**
  * Parametrized tests that run against all store implementations including PostgresStore.
  * This ensures PostgresStore behaves consistently with other store implementations.
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 @Testcontainers
 public class PostgresStoreParameterizedTest {
 

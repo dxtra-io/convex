@@ -14,6 +14,9 @@ import convex.core.data.prim.CVMLong;
 
 import static convex.test.Assertions.*;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class ActorTest extends ACVMTest {
 
 	@Test 

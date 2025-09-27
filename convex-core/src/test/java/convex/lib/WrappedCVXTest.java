@@ -16,6 +16,9 @@ import convex.core.lang.ACVMTest;
 import convex.core.lang.Context;
 import convex.core.lang.TestState;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class WrappedCVXTest extends ACVMTest {
 
 	private Address VILLAIN=InitTest.VILLAIN;

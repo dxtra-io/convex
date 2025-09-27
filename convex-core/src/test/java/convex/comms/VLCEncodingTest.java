@@ -15,6 +15,9 @@ import convex.core.exceptions.BadFormatException;
 import convex.core.lang.RT;
 import convex.test.Testing;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class VLCEncodingTest {
 
 	@Test

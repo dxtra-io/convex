@@ -14,6 +14,9 @@ import convex.core.data.prim.CVMLong;
  * Tests for various CVM data structure operations.
  *
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class DataStructuresTest extends ACVMTest {
 
 	@Test

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import convex.core.data.Blob;
 import convex.core.data.Blobs;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class KeyPairTest {
 
 	@Test

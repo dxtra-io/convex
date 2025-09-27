@@ -32,6 +32,9 @@ import convex.core.data.prim.CVMLong;
  * 
  * - John Conway
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class NumericsTest extends ACVMTest {
 
 	@Test

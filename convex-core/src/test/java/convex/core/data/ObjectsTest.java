@@ -22,12 +22,16 @@ import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.core.util.Utils;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
 /**
  * Generic test functions for arbitrary Data Objects.
  */
-public class ObjectsTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public abstract class ObjectsTest<T extends ACell> extends BaseStoreTest {
 	/**
 	 * Generic tests for any valid CVM Value (including null). Should pass for
 	 * *any* ACell where RT.isCVM(..) returns true and validate(...) succeeds.

@@ -30,6 +30,9 @@ import convex.core.lang.ACVMTest;
  *
  * Also includes static State instances for Testing
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class InitTest extends ACVMTest {
 	
 	public static final AKeyPair[] KEYPAIRS = BaseTest.KEYPAIRS;

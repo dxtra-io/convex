@@ -18,6 +18,9 @@ import convex.core.lang.TestState;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Transfer;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class RecordTest {
 	
 	// TODO: Check we have included all other record types

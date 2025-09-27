@@ -10,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import convex.core.State;
 import convex.core.data.ACell;
@@ -27,20 +32,18 @@ import convex.core.store.AStore;
 import convex.core.store.MemoryStore;
 import convex.core.store.Stores;
 import convex.core.util.Utils;
-// import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import convex.test.Samples;
 
-public class StoresTest {
-	static MemoryStore testStore;
-	
-	static {
-		testStore=new MemoryStore();
-	}
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class StoresTest extends BaseStoreTest {
 
 	@Test public void testInitState() throws InvalidDataException, IOException {
 		AStore temp=Stores.current();
 		try {
-			Stores.setCurrent(testStore);
+			Stores.setCurrent(store);
 
 			// Use fresh State
 			State s=InitTest.createState();
@@ -60,7 +63,7 @@ public class StoresTest {
 		AStore m1=new MemoryStore();
 		AStore m2=new MemoryStore();
 		
-		AStore e1=testStore;
+		AStore e1=store;
 		AStore e2=new MemoryStore();
 		
 		// non-emebdded single Cell

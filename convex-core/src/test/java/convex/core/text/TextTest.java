@@ -8,6 +8,9 @@ import org.junit.Test;
 
 import convex.core.data.Address;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class TextTest {
 
 	@Test

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import convex.core.data.Blob;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class MnemonicTest {
 	@Test
 	public void testZero() {

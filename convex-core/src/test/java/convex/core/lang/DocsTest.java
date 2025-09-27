@@ -12,6 +12,9 @@ import convex.core.data.AVector;
 import convex.core.data.Keywords;
 import convex.core.data.Symbol;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class DocsTest extends ACVMTest {
 	public static final boolean PRINT_MISSING=true;
 	

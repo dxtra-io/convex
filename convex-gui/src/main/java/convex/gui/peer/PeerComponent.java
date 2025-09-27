@@ -21,14 +21,12 @@ import convex.core.data.AccountKey;
 import convex.core.data.Address;
 import convex.core.data.PeerStatus;
 import convex.core.text.Text;
-import convex.etch.EtchStore;
 import convex.gui.client.ConvexClient;
 import convex.gui.components.BaseImageButton;
 import convex.gui.components.BaseListComponent;
 import convex.gui.components.CodeLabel;
 import convex.gui.components.DropdownMenu;
 import convex.gui.components.Identicon;
-import convex.gui.etch.EtchWindow;
 import convex.gui.models.StateModel;
 import convex.gui.server.PeerWindow;
 import convex.gui.state.StateExplorer;
@@ -47,11 +45,6 @@ public class PeerComponent extends BaseListComponent {
 	public void launchPeerWindow(ConvexLocal peer) {
 		PeerWindow pw = new PeerWindow(peer);
 		pw.run();
-	}
-
-	public void launchEtchWindow(ConvexLocal peer) {
-		EtchWindow ew = new EtchWindow(peer);
-		ew.run();
 	}
 
 	public void launchExploreWindow(Convex peer) {
@@ -120,14 +113,6 @@ public class PeerComponent extends BaseListComponent {
 		});
 		popupMenu.add(exploreButton);
 
-		if (server.getStore() instanceof EtchStore) {
-			JMenuItem storeButton = new JMenuItem("Explore Etch store",Toolkit.menuIcon(0xf80e));
-			storeButton.addActionListener(e -> {
-				launchEtchWindow(convex);
-			});
-			popupMenu.add(storeButton);
-		}
-		
 		JMenuItem killConn = new JMenuItem("Kill Connections",Toolkit.menuIcon(0xe16f));
 		killConn.addActionListener(e -> {
 			server.getConnectionManager().closeAllConnections();

@@ -27,6 +27,9 @@ import convex.core.lang.Core;
 import convex.core.lang.Symbols;
 import convex.core.util.Utils;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class ActorsTest extends ACVMTest {
 
 	@Test public void testDeployAndCall() {

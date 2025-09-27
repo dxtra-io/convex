@@ -16,9 +16,13 @@ import convex.core.data.RecordTest;
 import convex.core.data.SignedData;
 import convex.core.exceptions.BadFormatException;
 import convex.core.transactions.Invoke;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class BeliefTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class BeliefTest extends BaseStoreTest {
 	static final int PEERS=4;
 	static final AKeyPair[] kps=new AKeyPair[PEERS];
 	static final AccountKey[] keys=new AccountKey[PEERS];

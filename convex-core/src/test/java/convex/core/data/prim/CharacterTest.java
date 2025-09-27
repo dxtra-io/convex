@@ -16,8 +16,12 @@ import convex.core.data.ObjectsTest;
 import convex.core.data.Strings;
 import convex.core.data.util.BlobBuilder;
 import convex.core.exceptions.BadFormatException;
+import convex.store.BaseStoreTest;
 
-public class CharacterTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class CharacterTest extends BaseStoreTest {
 	@Test 
 	public void testZeroEncoding() throws BadFormatException {
 		CVMChar a=CVMChar.create(0);

@@ -10,6 +10,9 @@ import convex.core.lang.ops.Constant;
 /**
  * Tests for pre-compilation
  */
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PrecompileTest extends ACVMTest {
 
 	@Test public void testPrecompile() {

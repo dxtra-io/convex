@@ -13,12 +13,15 @@ import org.junit.jupiter.api.Test;
 import convex.cli.CLTester;
 import convex.cli.ExitCodes;
 import convex.cli.Helpers;
+import convex.cli.PostgresTestHelper;
 import convex.core.crypto.AKeyPair;
 import convex.core.crypto.PFXTools;
 import convex.core.data.Keyword;
 import convex.core.data.Keywords;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 import convex.core.util.Utils;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import convex.peer.API;
 import convex.peer.ConfigException;
 import convex.peer.LaunchException;
@@ -29,7 +32,6 @@ public class ClientTest {
 	private static final char[] KEY_PASSWORD = "genesisKeyPassword".toCharArray();
 
 	private static final File TEMP_KEYSTORE;
-	private static final File TEMP_ETCH;
 	private static final String KEYSTORE_FILENAME;
 	
 	static final AKeyPair kp=AKeyPair.createSeeded(124564);
@@ -38,7 +40,6 @@ public class ClientTest {
 	static {
 		try {
 			TEMP_KEYSTORE=Helpers.createTempFile("tempClientKeystore", ".pfx");
-			TEMP_ETCH=Helpers.createTempFile("tempEtchClientDatabase", ".db");
 			keystore=PFXTools.createStore(TEMP_KEYSTORE, KEYSTORE_PASSWORD);
 			PFXTools.setKeyPair(keystore, kp, KEY_PASSWORD);
 			PFXTools.saveStore(keystore, TEMP_KEYSTORE, KEYSTORE_PASSWORD);
@@ -54,11 +55,12 @@ public class ClientTest {
  	
 	@Test public void testClientCommands() throws IOException, TimeoutException, InterruptedException, LaunchException, ConfigException {
 		
-		try (EtchStore store = EtchStore.createTemp(TEMP_ETCH.getCanonicalPath())) {
+		try (PostgresStore store = PostgresTestHelper.createStore(true)) {
 
 			HashMap<Keyword,Object> config=new HashMap<>();
 			config.put(Keywords.KEYPAIR, kp);
 			config.put(Keywords.STORE, store);
+			Stores.setGlobalStore(store);
 			Server s=API.launchPeer(config);
 			String port=Integer.toString(s.getPort());
 		
@@ -89,6 +91,7 @@ public class ClientTest {
 			tester.assertExitCode(ExitCodes.SUCCESS);
 				
 			s.close();
+			Stores.setGlobalStore(new MemoryStore());
 		}
 	}
 

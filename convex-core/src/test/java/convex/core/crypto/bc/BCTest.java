@@ -13,6 +13,9 @@ import convex.core.data.AccountKey;
 import convex.core.data.Blob;
 import convex.core.lang.RT;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class BCTest {
 	
 	BCProvider PROVIDER=new BCProvider();

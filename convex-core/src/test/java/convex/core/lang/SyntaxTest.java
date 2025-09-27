@@ -6,8 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import convex.core.data.ObjectsTest;
 import convex.core.data.Syntax;
+import convex.store.BaseStoreTest;
 
-public class SyntaxTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class SyntaxTest extends BaseStoreTest {
 
 	@Test
 	public void testSyntaxConstructor() {

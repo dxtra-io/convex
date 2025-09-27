@@ -8,12 +8,15 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import convex.api.Convex;
 import convex.core.State;
 import convex.core.crypto.AKeyPair;
 import convex.core.exceptions.InvalidDataException;
+import convex.core.store.MemoryStore;
+import convex.core.store.Stores;
 import convex.dlfs.DLFileSystem;
 import convex.gui.client.ConvexClient;
 import convex.gui.dlfs.DLFSBrowser;
@@ -22,6 +25,8 @@ import convex.gui.tools.HackerTools;
 import convex.gui.utils.Toolkit;
 import convex.peer.PeerException;
 import convex.peer.Server;
+import convex.postgres.PostgresStore;
+import convex.gui.PostgresTestHelper;
 
 /**
  * We can't test much of the GUI easily in unit tests, but we can at least test
@@ -32,20 +37,27 @@ public class GUITest {
 	static Server SERVER;
 	static Convex CONVEX;
 	private static PeerGUI manager = null;
+	private static PostgresStore STORE;
 	
 
 	static {
 		try {
 			Toolkit.init();
+			STORE = PostgresTestHelper.createStore(true);
+			Stores.setGlobalStore(STORE);
 			manager=new PeerGUI(3,AKeyPair.generate());
 			SERVER=manager.getPrimaryServer();
 			CONVEX=Convex.connect(SERVER);
 		} catch (HeadlessException e) {
-			// ensure null manager
 			manager=null;
+			if (STORE != null) {
+				STORE.close();
+				STORE = null;
+			}
+			Stores.setGlobalStore(new MemoryStore());
 		} catch (PeerException e) {
 			throw new Error(e);
-		} 
+		}
 	}
 	
 	/**
@@ -96,5 +108,19 @@ public class GUITest {
 		
 		ConvexClient client=new ConvexClient(CONVEX);
 		assertNotNull(client.tabs);
+	}
+
+	@AfterAll
+	public static void shutdownPeers() {
+		if (manager!=null) {
+			manager.close();
+		}
+		if (SERVER!=null) {
+			SERVER.shutdown();
+		}
+		if (STORE!=null) {
+			STORE.close();
+		}
+		Stores.setGlobalStore(new MemoryStore());
 	}
 }

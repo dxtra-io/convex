@@ -6,7 +6,7 @@ import java.util.List;
 import convex.cli.CLIError;
 import convex.cli.ExitCodes;
 import convex.core.data.AccountKey;
-import convex.etch.EtchStore;
+import convex.postgres.PostgresStore;
 import convex.peer.API;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -27,16 +27,13 @@ public class PeerList extends APeerCommand {
 	@Override
 	public void execute() {
 		
-		EtchStore etch=etchMixin.getEtchStore();
-		try {
-			List<AccountKey> keys=API.listPeers(etch);
+		try (PostgresStore store = openStore()) {
+			List<AccountKey> keys=API.listPeers(store);
 			for (AccountKey k: keys) {
 				println(k.toHexString());
 			}
 		} catch (IOException e) {
-			throw new CLIError(ExitCodes.IOERR,"IO Error reating etch store at "+etch,e);
-		} finally {
-			etch.close();
+			throw new CLIError(ExitCodes.IOERR,"IO Error reading PostgreSQL store: "+e.getMessage(),e);
 		}
 	}
 }

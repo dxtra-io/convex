@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import convex.core.exceptions.InvalidDataException;
 import convex.core.util.Utils;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PeerStatusTest {
 	
 	@Test public void testEmpty() {

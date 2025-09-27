@@ -64,7 +64,7 @@ import convex.core.util.Utils;
 public class PostgresStoreRaceConditionTest {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15.8-alpine")
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.4")
             .withDatabaseName("convex_test")
             .withUsername("test_user")
             .withPassword("test_pass");

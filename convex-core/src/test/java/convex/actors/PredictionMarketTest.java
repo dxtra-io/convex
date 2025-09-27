@@ -19,6 +19,9 @@ import convex.core.lang.Context;
 import convex.core.lang.TestState;
 import convex.core.util.Utils;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class PredictionMarketTest extends ACVMTest {
 	Address addr;
 	

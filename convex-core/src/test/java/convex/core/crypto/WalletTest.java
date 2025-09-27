@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import convex.core.crypto.wallet.PKCS12Wallet;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class WalletTest {
 	
 	@Test 

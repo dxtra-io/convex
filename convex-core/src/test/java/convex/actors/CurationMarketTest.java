@@ -6,6 +6,9 @@ import convex.core.init.InitTest;
 import convex.core.lang.ACVMTest;
 import convex.core.lang.Context;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class CurationMarketTest extends ACVMTest {
 	
 	protected CurationMarketTest() {

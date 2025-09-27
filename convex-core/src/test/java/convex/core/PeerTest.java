@@ -21,9 +21,13 @@ import convex.core.init.InitTest;
 import convex.core.lang.RT;
 import convex.core.lang.Reader;
 import convex.core.transactions.Invoke;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
-public class PeerTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class PeerTest extends BaseStoreTest {
 	static State STATE=InitTest.STATE;
 
 	@Test

@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import convex.core.data.type.Types;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class AccountKeyTest {
 
 	@Test

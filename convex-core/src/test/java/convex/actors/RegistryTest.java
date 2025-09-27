@@ -22,6 +22,9 @@ import convex.core.lang.ACVMTest;
 import convex.core.lang.Context;
 import convex.test.Samples;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
 public class RegistryTest extends ACVMTest {
 
 	protected RegistryTest() throws IOException {

@@ -46,7 +46,8 @@ import convex.core.lang.Reader;
 import convex.core.lang.Symbols;
 import convex.core.store.AStore;
 import convex.core.store.Stores;
-import convex.core.store.MemoryStore;
+import convex.postgres.PostgresStore;
+import convex.store.PostgresTestHelper;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Call;
 import convex.core.transactions.Invoke;
@@ -66,11 +67,12 @@ public class ServerTest {
 	private HashMap<Long, Object> results = new HashMap<>();
 
 	private static TestNetwork network;
-	private static AStore store = new MemoryStore();
+	private static PostgresStore store = PostgresTestHelper.ensureStore();
 
 	@BeforeAll
 	public static void init() {
 		Stores.setGlobalStore(store);
+		Stores.setCurrent(store);
 		network = TestNetwork.getInstance();
 	}
 

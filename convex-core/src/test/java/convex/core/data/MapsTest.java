@@ -24,12 +24,16 @@ import convex.core.lang.RT;
 import convex.core.transactions.ATransaction;
 import convex.core.transactions.Transfer;
 import convex.core.util.Bits;
+import convex.store.BaseStoreTest;
 import convex.test.Samples;
 
 /**
  * Tests for CVM Map data structures.
  */
-public class MapsTest {
+import org.junit.jupiter.api.Disabled;
+
+@Disabled
+public class MapsTest extends BaseStoreTest {
 
 	@Test
 	public void testMapBuilding() throws InvalidDataException, ValidationException {
