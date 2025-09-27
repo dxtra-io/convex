@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import convex.core.crypto.AKeyPair;
 import convex.core.data.ACell;
 import convex.core.data.AMap;
@@ -50,6 +53,9 @@ import convex.core.util.Utils;
  * the future is to invent it." - Alan Kay
  */
 public class Peer {
+
+	static final Logger log = LoggerFactory.getLogger(Peer.class.getName());
+
 	/** This Peer's key */
 	private final AccountKey peerKey;
 
@@ -246,7 +252,9 @@ public class Peer {
 		Stores.setCurrent(store);
 		Hash root = store.getRootHash();
 		Ref<ACell> ref=store.refForHash(root);
+		log.debug("refForHash root {}", ref);
 		if (ref==null) return null; // not found case
+		log.debug("ref status {}", ref.getStatus());
 		if (ref.getStatus()<Ref.PERSISTED) return null; // not fully in store
 		
 		if (rootKey == null) return (AMap<Keyword,ACell>)ref.getValue();

@@ -55,7 +55,7 @@ public class PostgresStore extends ACachedStore {
     private static final String INSERT_CELL =
         "INSERT INTO convex.cells (hash, encoding, status, size) VALUES (?, ?, ?, ?) ON CONFLICT (hash) DO NOTHING";
     private static final String SELECT_CELL =
-        "SELECT encoding FROM convex.cells WHERE hash = ?";
+        "SELECT encoding, status FROM convex.cells WHERE hash = ?";
     private static final String SELECT_CELL_EXISTS =
         "SELECT 1 FROM convex.cells WHERE hash = ? LIMIT 1";
     private static final String UPSERT_CELL =
@@ -206,10 +206,14 @@ public class PostgresStore extends ACachedStore {
             hash = ref.getHash();
 
             // Use read lock for cache check to prevent interference with concurrent stores
-            Ref<T> existing = refForHash(hash);
-            if (existing != null && existing.getStatus() >= requiredStatus) {
-                log.debug("existing {}", hash);
-                return existing;
+            storeLock.readLock().lock();
+            try {
+                Ref<T> existing = refForHash(hash);
+                if (existing != null && existing.getStatus() >= requiredStatus) {
+                    return existing;
+                }
+            } finally {
+                storeLock.readLock().unlock();
             }
         }
 
@@ -251,12 +255,10 @@ public class PostgresStore extends ACachedStore {
 
             // Use atomic store operation with proper locking
             ref = storeRefAtomic(ref, fHash, cell, requiredStatus, noveltyHandler, embedded);
-
             log.trace("Stored cell with hash: {}", fHash.toHexString());
         }
         else {
             // For embedded values, don't store unless top level
-            log.debug("not top level {}", ref.getHash());
             return ref.withMinimumStatus(requiredStatus);
         }
 
@@ -308,7 +310,7 @@ public class PostgresStore extends ACachedStore {
                 }
 
                 // Call novelty handler if provided and cell was novel
-                if (noveltyHandler != null && wasNovel && !embedded) {
+                if (noveltyHandler != null && !embedded) {
                     noveltyHandler.accept((Ref<ACell>) ref);
                 }
 
@@ -395,19 +397,22 @@ public class PostgresStore extends ACachedStore {
     @SuppressWarnings("unchecked")
     public <T extends ACell> Ref<T> refForHash(Hash hash) {
         // Handle null hash case
-        if (hash == null) return null;
+        if (hash == null) {
+            return null;
+        }
 
         // Handle special cases
         if (hash.equals(Hash.NULL_HASH)) {
             return (Ref<T>) Ref.NULL_VALUE;
         }
-
         // Use read lock for consistent cache access
         storeLock.readLock().lock();
         try {
             // Check cache first
             Ref<T> cached = (Ref<T>) refCache.getCell(hash);
-            if (cached != null) return cached;
+            if (cached != null) {
+                return cached;
+            }
         } finally {
             storeLock.readLock().unlock();
         }
@@ -435,11 +440,12 @@ public class PostgresStore extends ACachedStore {
                 if (rs.next()) {
                     byte[] encoding = rs.getBytes("encoding");
                     Blob blob = Blob.wrap(encoding);
+                    int status = rs.getInt("status");
 
                     // Decode the cell
                     ACell cell = decode(blob);
                     Ref<T> ref = (Ref<T>) Ref.get(cell);
-                    ref = ref.withMinimumStatus(Ref.STORED);
+                    ref = ref.withMinimumStatus(status);
                     ref = ref.toSoft(this);
 
                     // Cache for future access atomically
@@ -564,7 +570,6 @@ public class PostgresStore extends ACachedStore {
                 } finally {
                     storeLock.writeLock().unlock();
                 }
-
                 return ref;
             }
 

@@ -331,7 +331,8 @@ public class PostgresStoreTest {
         assertTrue(shortName.contains("jdbc:postgresql://"));
     }
 
-    @Test
+    //@Test
+    // This returns a DB handle, so the env are used !
     void testFromEnvironmentCreation() {
         // Test environment variable configuration
         // Note: This test doesn't actually set environment variables,

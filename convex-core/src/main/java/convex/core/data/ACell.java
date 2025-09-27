@@ -1,11 +1,17 @@
 package convex.core.data;
 
+import java.util.function.Consumer;
+import java.io.IOException;
+
+
 import convex.core.Constants;
 import convex.core.data.type.AType;
 import convex.core.data.type.Types;
 import convex.core.data.util.BlobBuilder;
 import convex.core.exceptions.InvalidDataException;
 import convex.core.util.Utils;
+import convex.core.store.AStore;
+import convex.core.store.Stores;
 
 /**
  * Abstract base class for Cells.
@@ -521,6 +527,38 @@ public abstract class ACell extends AObject implements IWriteable, IValidated {
 		//	// throw new IllegalStateException("Cell of type "+Utils.getClassName(this)+" already has cached Ref");
 		}
 		this.cachedRef=(Ref<ACell>) ref;
+	}
+
+
+	/**
+	 * Creates a persisted Ref with the given value in the current store.
+	 * 
+	 * Novelty handler is called for all new Refs that are persisted (recursively),
+	 * starting from lowest levels (depth first order)
+	 * 
+	 * @param <T> Type of Value
+	 * @param value Any CVM value to persist
+	 * @param noveltyHandler Novelty handler to call for any Novelty (may be null)
+	 * @return Persisted Ref
+	 */
+	public static <T extends ACell> Ref<T> createPersisted(T value, Consumer<Ref<ACell>> noveltyHandler) throws IOException {
+		Ref<T> ref = Ref.get(value);
+		if (ref.isPersisted()) return ref;
+		AStore store=Stores.current();
+		ref = (Ref<T>) store.storeTopRef(ref, Ref.PERSISTED,noveltyHandler);
+		return ref;
+	}
+
+	/**
+	 * Creates a persisted Ref with the given value in the current store. Returns
+	 * the current Ref if already persisted
+	 * 
+	 * @param <T> Type of Value
+	 * @param value Any CVM value to persist
+	 * @return Ref to the given value
+	 */
+	public static <T extends ACell> Ref<T> createPersisted(T value) throws IOException {
+		return createPersisted(value, null);
 	}
 
 	/**
