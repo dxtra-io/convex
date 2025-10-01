@@ -6,7 +6,7 @@
 	<artifactId>convex-observer</artifactId>
 
 	<parent>
-		<groupId>world.convex</groupId>
+		<groupId>io.dxtra</groupId>
 		<artifactId>convex</artifactId>
 		<version>0.8.2-SNAPSHOT</version>
 	</parent>
@@ -24,12 +24,12 @@
 			<version>${hc.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-core</artifactId>
 			<version>${convex.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-peer</artifactId>
 			<version>${convex.version}</version>
 		</dependency>
@@ -47,7 +47,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-java</artifactId>
 			<version>0.8.2-SNAPSHOT</version>
 		</dependency>

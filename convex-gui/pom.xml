@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<groupId>world.convex</groupId>
+		<groupId>io.dxtra</groupId>
 		<artifactId>convex</artifactId>
 		<version>0.8.2-SNAPSHOT</version>
 	</parent>
@@ -26,25 +26,25 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-peer</artifactId>
 			<version>${convex.version}</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-core</artifactId>
 			<version>${convex.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-observer</artifactId>
 			<version>${convex.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>world.convex</groupId>
+			<groupId>io.dxtra</groupId>
 			<artifactId>convex-restapi</artifactId>
 			<version>${convex.version}</version>
 		</dependency>

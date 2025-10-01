@@ -1,40 +1,103 @@
-name: tests
-on: [push]
-
-###
+name: Build Convex and Publish to Maven
+on:
+  push:
+    branches:
+      - production
+      - staging
+      - local
 
 jobs:
-
-  test:
-
-    strategy:
-      matrix:
-        java-version:
-          - 21
-        os:
-          - ubuntu-latest
-
-    runs-on: ${{ matrix.os }}
+  test-build-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Prepare Java
-        uses: actions/setup-java@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Java and Maven
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: ${{ matrix.java-version }}
+          java-version: '21'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
       - name: Maven dependencies cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          path: ~/.m2
-          restore-keys: ${{ runner.os }}-m2
-      - name: Install and run tests
-        run: mvn clean install
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+          path: |
+            ~/.m2/repository
+            ~/.m2/wrapper
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Extract and set version
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BRANCH_NAME=${{ github.ref_name }}
+
+          # Extract current version from pom.xml
+          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+          # Append branch and commit info to existing version
+          BUILD_VERSION="${POM_VERSION}-${BRANCH_NAME}-${SHORT_SHA}-build.${GITHUB_RUN_NUMBER}"
+          echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
+          echo "Building version: ${BUILD_VERSION}"
+
+          # Update pom.xml versions with new build version
+          mvn versions:set -DnewVersion=${BUILD_VERSION} -DgenerateBackupPoms=false
+
+      - name: Build and test
+        run: mvn clean install -T 1C
+
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Configure settings.xml for GitHub Packages
+          cat > ${{ github.workspace }}/settings.xml << EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${GITHUB_ACTOR}</username>
+                <password>${GITHUB_TOKEN}</password>
+              </server>
+            </servers>
+            <profiles>
+              <profile>
+                <id>github</id>
+                <repositories>
+                  <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/dxtra-io/convex</url>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
+            <activeProfiles>
+              <activeProfile>github</activeProfile>
+            </activeProfiles>
+          </settings>
+          EOF
+
+          # Deploy to GitHub Packages
+          mvn deploy -s ${{ github.workspace }}/settings.xml -DskipTests
+
+      - name: Trigger convex-web build
+        if: success()
+        uses: peter-evans/repository-dispatch@v3
         with:
-          name: convex-jar
-          path: convex-integration/target/convex.jar # Path to the built .jar
-          retention-days: 7 # Optional: Set retention period
+          token: ${{ secrets.DXTRA_PRIVATE_REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          repository: dxtra-io/convex-web
+          event-type: convex-updated-${{ github.ref_name }}
+          client-payload: |
+            {
+              "ref": "${{ github.ref_name }}",
+              "sha": "${{ github.sha }}",
+              "version": "${{ env.BUILD_VERSION }}"
+            }
