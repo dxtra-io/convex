@@ -90,9 +90,10 @@ jobs:
 
       - name: Trigger convex-web build
         if: success()
+        continue-on-error: true
         uses: peter-evans/repository-dispatch@v3
         with:
-          token: ${{ secrets.DXTRA_PRIVATE_REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DXTRA_PRIVATE_REPO_ACCESS_TOKEN }}
           repository: dxtra-io/convex-web
           event-type: convex-updated-${{ github.ref_name }}
           client-payload: |
