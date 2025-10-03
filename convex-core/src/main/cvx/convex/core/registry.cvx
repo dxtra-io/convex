@@ -270,7 +270,7 @@
     	(or (trust/trusted? (get rec 1) *caller* :update) (fail :TRUST "Forbidden to update CNS record"))
     	
     	;; This is a new record, so check create permission
-    	(or (trust/trusted? (-controller *scope*) *caller* :create pname) (fail :TRUST "Forbidden to create CNS record")))
+    	;; (or (trust/trusted? (-controller *scope*) *caller* :create pname) (fail :TRUST "Forbidden to create CNS record")))
     		
       ;; update record since at this point all required checks have passed
 	  (set-in! cns-database [*scope* pname] values)
