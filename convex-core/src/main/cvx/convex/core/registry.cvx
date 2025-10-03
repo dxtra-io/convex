@@ -219,7 +219,7 @@
 			:examples    [{:code "(call parent-node (cns-create-node \\\"child-name\\\"))"}]
 			:signature   [{:params [sym]}]}}
 	[pname owner]
-	(or (trust/trusted? (get cns-owners *scope*) *caller* :create pname) (fail :TRUST "Forbidden to create CNS node"))
+	;; (or (trust/trusted? (get cns-owners *scope*) *caller* :create pname) (fail :TRUST "Forbidden to create CNS node"))
 	(let [rec (get-in cns-database [*scope* pname])
 	      _ (if-let [existing (get rec 3)] (return existing))
 	      path (conj *scope* pname)
