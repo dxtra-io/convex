@@ -16,7 +16,7 @@ public class GenesisTest {
 		State genesis=Init.createState(Init.DEFAULT_GOV_KEY, Init.DEFAULT_GENESIS_KEY, List.of(Init.FIRST_PEER_KEY));
 		// This changes because of updates to cvx files
 		// assertEquals("b0e44f2a645abfa539f5b96b7a0eabb0f902866feaff0f7c12d1213e02333f13",genesis.getHash().toHexString());
-		assertEquals("466df8fae668a99e4cc6ca8b2bc19c24639d71b17a70e9647552c15a0156db51",genesis.getHash().toHexString());
+		assertEquals("6e9dda036ece50a746cffd6965e1242f4c855307bd71e1ef8f0932770e1de56a",genesis.getHash().toHexString());
 		
 		assertEquals(Init.FIRST_USER_KEY,genesis.getAccount(13).getAccountKey());
 		
