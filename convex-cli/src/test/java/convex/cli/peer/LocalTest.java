@@ -161,8 +161,7 @@ public class LocalTest {
 			);
 		syncTester.waitForStart(5000);
 		syncTester.interrupt();
-		// After CNS unlocking changes, peer starts successfully and shuts down cleanly
-		syncTester.assertExitCode(ExitCodes.SUCCESS);
+		syncTester.assertExitCode(ExitCodes.INTERRUPT);
 	}
 
 	@Test
